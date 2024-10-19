@@ -17,7 +17,6 @@ function handleDisconnect() {
   connectDB.connect((err) => {
     if (err) {
       console.error("Error connecting to the database:", err);
-      //setTimeout(handleDisconnect, 2000);
     } else {
       console.log("Connected to the database");
     }
@@ -34,12 +33,11 @@ function handleDisconnect() {
       console.error("Database connection was closed. Reconnecting...");
       handleDisconnect();
     } else {
-      // throw err;
       console.log("database connection error:");
     }
   });
 }
 
-handleDisconnect(); // Initial connection attempt
+handleDisconnect();
 
 module.exports = connectDB;

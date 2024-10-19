@@ -1,0 +1,136 @@
+const asyncHandler = require("express-async-handler");
+const dbConnect = require("../config/dbConnection");
+const handleGlobalFilters = require("../middleware/filtersHandler");
+const parseNestedJSON = require("../middleware/parseHandler");
+const {
+    createClauseHandler,
+    updateClauseHandler,
+} = require("../middleware/clauseHandler");
+const handleRequiredFields = require("../middleware/requiredFieldsChecker");
+const { generateRandomNumber } = require("../middleware/valueGenerator");
+
+const getEmployeesCount = asyncHandler(async (req, res) => {
+    let sql = "SELECT count(*) as employeesCount FROM employees";
+    const filtersQuery = handleGlobalFilters(req.query, true);
+    sql += filtersQuery;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("getEmployeesCount error");
+        }
+        const employeesCount = result[0]["employeesCount"];
+        res.status(200).send(String(employeesCount));
+    });
+});
+
+const getEmployees = asyncHandler(async (req, res) => {
+    let sql = "SELECT * FROM employees";
+    const queryParams = req.query;
+    console.log(queryParams)
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+    console.log(sql)
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("getEmployees error:");
+        }
+        result = parseNestedJSON(result);
+        res.status(200).send(result);
+    });
+});
+
+const getEmployeeById = asyncHandler((req, res) => {
+    const sql = `SELECT * FROM employees WHERE employeeId = ${req.params.id}`;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("getEmployeeById error:");
+        }
+        result = parseNestedJSON(result);
+        res.status(200).send(result[0]);
+    });
+});
+
+
+const createEmployee = asyncHandler((req, res) => {
+    let employeeId = generateRandomNumber(9);
+    // console.log(req)
+    req.body["employeeId"] = employeeId;
+    req.body["employeeInternalStatus"] = 1;
+    req.body["lastEmployeeInternalStatus"] = 1;
+    req.body["createdBy"] = req.user.username;
+    req.body["lastUpdatedBy"] = req.user.username;
+    const createClause = createClauseHandler(req.body);
+    const sql = `INSERT INTO employees (${createClause[0]}) VALUES (${createClause[1]})`;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("createEmployee error:");
+        }
+        res.status(200).send(true);
+    });
+});
+
+const updateEmployee = asyncHandler((req, res) => {
+    const id = req.params.id;
+    const checkRequiredFields = handleRequiredFields("employees", req.body);
+    if (!checkRequiredFields) {
+        return res.status(422).send("Please fill all required fields");
+    }
+    const updateClause = updateClauseHandler(req.body);
+    const updateSql = `UPDATE employees SET ${updateClause} WHERE employeeId = ?`;
+    dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
+        if (updateErr) {
+            console.error("updateEmployee error:", updateErr);
+            return res.status(500).send("Internal server error");
+        }
+        return res.status(200).send(updateResult);
+    });
+});
+
+
+
+const deleteEmployee = asyncHandler((req, res) => {
+    console.log(req.params)
+    const sql = `DELETE FROM employees WHERE employeeId = ${req.params.id}`;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("deleteEmployee error:", err);
+            return res.status(500).send("Internal server error");
+        }
+        res.status(200).json({ message: "Employee Deleted Successfully" });
+    });
+});
+
+const changeEmployeeStatus = asyncHandler((req, res) => {
+    const id = req.params.employeeId;
+    const statusId = req.params.statusId;
+    const createSql = `SELECT * FROM employees WHERE employeeId = ${id}`;
+    dbConnect.query(createSql, (err, result) => {
+        if (err) {
+            console.log("changeEmployeeStatus error:");
+        }
+        if (result && result[0] && statusId) {
+            let statusData = {
+                lastEmployeeInternalStatus: result[0].employeeInternalStatus,
+                employeeInternalStatus: statusId,
+            };
+            const updateClause = updateClauseHandler(statusData);
+            const sql = `UPDATE employees SET ${updateClause} WHERE employeeId = ${id}`;
+            dbConnect.query(sql, (err, result) => {
+                if (err) {
+                    console.log("changeEmployeeStatus and updatecalss error:");
+                }
+                res.status(200).send(true);
+            });
+        } else {
+            res.status(422).send("No Employees Found");
+        }
+    });
+});
+module.exports = {
+    getEmployeeById,
+    getEmployeesCount,
+    getEmployees,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+    changeEmployeeStatus
+};
