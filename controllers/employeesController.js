@@ -22,6 +22,29 @@ const getEmployeesCount = asyncHandler(async (req, res) => {
     });
 });
 
+
+
+const createEmployeeFromInterview = asyncHandler((req, res) => {
+    let employeeId = generateRandomNumber(9);
+    console.log(req.body)
+    req.body["employeeId"] = employeeId;
+    req.body["employeeInternalStatus"] = 1;
+    req.body["lastEmployeeInternalStatus"] = 1;
+    req.body["createdBy"] = req.user.username;
+    req.body["lastUpdatedBy"] = req.user.username;
+    const createClause = createClauseHandler(req.body);
+    const sql = `INSERT INTO employees (${createClause[0]}) VALUES (${createClause[1]})`;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("createEmployeeFromInterview error:", err);
+        }
+        console.log(employeeId)
+        res.status(200).json({ id: employeeId });
+    });
+
+});
+
+
 const getEmployees = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM employees";
     const queryParams = req.query;
@@ -51,21 +74,41 @@ const getEmployeeById = asyncHandler((req, res) => {
 
 
 const createEmployee = asyncHandler((req, res) => {
-    let employeeId = generateRandomNumber(9);
-    // console.log(req)
-    req.body["employeeId"] = employeeId;
-    req.body["employeeInternalStatus"] = 1;
-    req.body["lastEmployeeInternalStatus"] = 1;
-    req.body["createdBy"] = req.user.username;
-    req.body["lastUpdatedBy"] = req.user.username;
-    const createClause = createClauseHandler(req.body);
-    const sql = `INSERT INTO employees (${createClause[0]}) VALUES (${createClause[1]})`;
-    dbConnect.query(sql, (err, result) => {
+    const phoneNumber = req.body.primaryPhone;
+    const checkPhoneQuery = `SELECT * FROM employees WHERE primaryPhone = ?`;
+    dbConnect.query(checkPhoneQuery, [phoneNumber], (err, result) => {
         if (err) {
-            console.log("createEmployee error:");
+            console.error("Error checking phone number:", err);
+            res.status(500).json({ error: "Internal server error" });
+        } else {
+            if (result.length > 0) {
+                const employee = result[0];
+                res
+                    .status(500)
+                    .send(
+                        `Employee already exists with phone number ${phoneNumber}, 
+                        created by - ${employee.createdBy}, Employee id - ${employee.id}`
+                    );
+            } else {
+                let employeeId = generateRandomNumber(9);
+                // console.log(req)
+                req.body["employeeId"] = employeeId;
+                req.body["employeeInternalStatus"] = 1;
+                req.body["lastEmployeeInternalStatus"] = 1;
+                req.body["createdBy"] = req.user.username;
+                req.body["lastUpdatedBy"] = req.user.username;
+                const createClause = createClauseHandler(req.body);
+                const sql = `INSERT INTO employees (${createClause[0]}) VALUES (${createClause[1]})`;
+                dbConnect.query(sql, (err, result) => {
+                    if (err) {
+                        console.log("createEmployee error:");
+                    }
+                    res.status(200).send(true);
+                });
+            }
         }
-        res.status(200).send(true);
     });
+
 });
 
 const updateEmployee = asyncHandler((req, res) => {
@@ -132,5 +175,6 @@ module.exports = {
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    changeEmployeeStatus
+    changeEmployeeStatus,
+    createEmployeeFromInterview
 };

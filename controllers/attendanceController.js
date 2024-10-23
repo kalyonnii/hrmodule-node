@@ -105,6 +105,29 @@ const deleteAttendance = asyncHandler((req, res) => {
 });
 
 
+[
+    {
+        employeeid: 5642523,
+        joiningdate: "04/15/2024",
+        workingDays: 27,
+        presentdays: 21,
+        absentdays: 6,
+        casualdays: 2,
+        noofdoublelopdays: 2,
+        latelopdays: 1,
+        totalabsentdays: 10,
+        totaldeductions: 10,
+        salary: 10,
+        daysalary: 866,
+        netsalarywithoutdoublelop: 21666,
+        netsalarywithdoublelop: 21000,
+        petrolexpenses: 0,
+        accountnumber: "874657346794",
+        ifsccode: "SAHFS6567",
+        branchname: "hyderabad"
+    }
+]
+
 module.exports = {
     getAttendanceById,
     getAttendance,

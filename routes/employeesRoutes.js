@@ -6,7 +6,8 @@ const {
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    changeEmployeeStatus
+    changeEmployeeStatus,
+    createEmployeeFromInterview
 } = require("../controllers/employeesController");
 const validateToken = require("../middleware/validateTokenHandler");
 
@@ -16,6 +17,7 @@ router.route("/").get(validateToken, getEmployees).post(validateToken, createEmp
 
 router.route("/total").get(validateToken, getEmployeesCount);
 
+router.route("/interviewtoemployee").post(validateToken, createEmployeeFromInterview);
 
 router
     .route("/:employeeId/changestatus/:statusId")
