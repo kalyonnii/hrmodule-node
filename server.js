@@ -16,8 +16,9 @@ app.use("/holidays", require("./routes/holidaysRoutes"));
 app.use("/users", require("./routes/usersRoutes"));
 app.use("/interviews", require("./routes/interviewRoutes"));
 app.use("/attendance", require("./routes/attendanceRoutes"));
-
-
+app.use("/leaves", require("./routes/leavemanagementRoutes"));
+app.use("/payroll", require("./routes/payrollRoutes"));
+app.use("/reports", require("./routes/reportsRoutes"));
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running at http://localhost:${process.env.PORT}`);

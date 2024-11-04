@@ -50,41 +50,74 @@ const getInterviewById = asyncHandler((req, res) => {
 
 
 const createInterview = asyncHandler((req, res) => {
-    // let interviewId = generateRandomNumber(9);
-    let interviewId = "I-" + generateRandomNumber(6);
-    // console.log(req)
-    req.body["interviewId"] = interviewId;
-    req.body["interviewInternalStatus"] = 1;
-    req.body["lastInterviewInternalStatus"] = 1;
-    req.body["createdBy"] = req.user.username;
-    req.body["lastUpdatedBy"] = req.user.username;
-    const createClause = createClauseHandler(req.body);
-    const sql = `INSERT INTO interviews (${createClause[0]}) VALUES (${createClause[1]})`;
-    dbConnect.query(sql, (err, result) => {
+
+    const phoneNumber = req.body.primaryPhone;
+    const checkPhoneQuery = `SELECT * FROM interviews WHERE primaryPhone = ?`;
+    dbConnect.query(checkPhoneQuery, [phoneNumber], (err, result) => {
         if (err) {
-            console.log("createInterview error:");
+            console.error("Error checking phone number:", err);
+            res.status(500).json({ error: "Internal server error" });
+        } else {
+            if (result.length > 0) {
+                const interview = result[0];
+                res
+                    .status(500)
+                    .send(
+                        `Interview already exists with phone number ${phoneNumber}, 
+                        created by - ${interview.createdBy}, Interview id - ${interview.interviewId}, Candidate Name - ${interview.candidateName}`
+                    );
+            } else {
+                let interviewId = "I-" + generateRandomNumber(6);
+                req.body["interviewId"] = interviewId;
+                req.body["interviewInternalStatus"] = 1;
+                req.body["lastInterviewInternalStatus"] = 1;
+                req.body["createdBy"] = req.user.username;
+                req.body["lastUpdatedBy"] = req.user.username;
+                const createClause = createClauseHandler(req.body);
+                const sql = `INSERT INTO interviews (${createClause[0]}) VALUES (${createClause[1]})`;
+                dbConnect.query(sql, (err, result) => {
+                    if (err) {
+                        console.log("createInterview error:");
+                    }
+                    res.status(200).send(true);
+                });
+            }
         }
-        res.status(200).send(true);
     });
 });
 
 const updateInterview = asyncHandler((req, res) => {
     const id = req.params.id;
+    const { primaryPhone } = req.body;
     const checkRequiredFields = handleRequiredFields("interviews", req.body);
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
     }
-    const updateClause = updateClauseHandler(req.body);
-    const updateSql = `UPDATE interviews SET ${updateClause} WHERE interviewId = ?`;
-    dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
-        if (updateErr) {
-            console.error("updateInterview error:", updateErr);
-            return res.status(500).send("Internal server error");
+    const checkPhoneQuery = `SELECT * FROM interviews WHERE primaryPhone = ? AND interviewId != ?`;
+    dbConnect.query(checkPhoneQuery, [primaryPhone, id], (err, result) => {
+        if (err) {
+            console.error("Error checking phone number:", err);
+            return res.status(500).json({ error: "Internal server error" });
         }
-        return res.status(200).send(updateResult);
+        if (result.length > 0) {
+            const interview = result[0];
+            return res
+                .status(409)
+                .send(
+                    `Interview already exists with phone number ${primaryPhone}, created by - ${interview.createdBy}, Interview ID - ${interview.interviewId}, Candidate Name - ${interview.candidateName}`
+                );
+        }
+        const updateClause = updateClauseHandler(req.body);
+        const updateSql = `UPDATE interviews SET ${updateClause} WHERE interviewId = ?`;
+        dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
+            if (updateErr) {
+                console.error("updateInterview error:", updateErr);
+                return res.status(500).send("Internal server error");
+            }
+            return res.status(200).send(updateResult);
+        });
     });
 });
-
 
 
 const deleteInterview = asyncHandler((req, res) => {
