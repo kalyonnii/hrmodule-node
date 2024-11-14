@@ -16,6 +16,7 @@ const getEmployeesCount = asyncHandler(async (req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getEmployeesCount error");
+            return res.status(500).send("Error in Fetching the Employees Count");
         }
         const employeesCount = result[0]["employeesCount"];
         res.status(200).send(String(employeesCount));
@@ -25,15 +26,12 @@ const getEmployeesCount = asyncHandler(async (req, res) => {
 
 
 const createEmployeeFromInterview = asyncHandler((req, res) => {
-
-
-
     const phoneNumber = req.body.primaryPhone;
-    const checkPhoneQuery = `SELECT * FROM employees WHERE primaryPhone = ?`;
+    const checkPhoneQuery = `SELECT * FROM employee WHERE primaryPhone = ?`;
     dbConnect.query(checkPhoneQuery, [phoneNumber], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
-            res.status(500).json({ error: "Internal server error" });
+            return res.status(500).send("Error in Checking the phone Number From Interview");
         } else {
             if (result.length > 0) {
                 const employee = result[0];
@@ -56,6 +54,7 @@ const createEmployeeFromInterview = asyncHandler((req, res) => {
                 dbConnect.query(sql, (err, result) => {
                     if (err) {
                         console.log("createEmployeeFromInterview error:", err);
+                        return res.status(500).send("Error in Creating Employee From Interview");
                     }
                     console.log(employeeId)
                     res.status(200).json({ id: employeeId });
@@ -63,8 +62,6 @@ const createEmployeeFromInterview = asyncHandler((req, res) => {
             }
         }
     });
-
-
 });
 
 
@@ -78,6 +75,7 @@ const getEmployees = asyncHandler(async (req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getEmployees error:");
+            return res.status(500).send("Error in Fetching the Employees");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result);
@@ -89,6 +87,7 @@ const getEmployeeById = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getEmployeeById error:");
+            return res.status(500).send("Error in Fetching the Employee Details");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result[0]);
@@ -102,7 +101,7 @@ const createEmployee = asyncHandler((req, res) => {
     dbConnect.query(checkPhoneQuery, [phoneNumber], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
-            res.status(500).json({ error: "Internal server error" });
+            return res.status(500).send("Error in Checking the Phone Number");
         } else {
             if (result.length > 0) {
                 const employee = result[0];
@@ -114,7 +113,6 @@ const createEmployee = asyncHandler((req, res) => {
                     );
             } else {
                 let employeeId = generateRandomNumber(9);
-                // console.log(req)
                 req.body["employeeId"] = employeeId;
                 req.body["employeeInternalStatus"] = 1;
                 req.body["lastEmployeeInternalStatus"] = 1;
@@ -125,19 +123,20 @@ const createEmployee = asyncHandler((req, res) => {
                 dbConnect.query(sql, (err, result) => {
                     if (err) {
                         console.log("createEmployee error:");
+                        return res.status(500).send("Error in Creating the Employee");
                     }
                     res.status(200).send(true);
                 });
             }
         }
     });
-
 });
 
 const updateEmployee = asyncHandler((req, res) => {
     const id = req.params.id;
     const { primaryPhone } = req.body;
     console.log(primaryPhone)
+    console.log(id)
     const checkRequiredFields = handleRequiredFields("employees", req.body);
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
@@ -146,7 +145,7 @@ const updateEmployee = asyncHandler((req, res) => {
     dbConnect.query(checkPhoneQuery, [primaryPhone, id], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
-            return res.status(500).json({ error: "Internal server error" });
+            return res.status(500).send("Error in Checking the Phone Number");
         }
         if (result.length > 0) {
             const employee = result[0];
@@ -161,7 +160,7 @@ const updateEmployee = asyncHandler((req, res) => {
         dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
             if (updateErr) {
                 console.error("updateEmployee error:", updateErr);
-                return res.status(500).send("Internal server error");
+                return res.status(500).send("Error in Updating the Employee Details");
             }
             console.log(updateResult);
             return res.status(200).send(updateResult);
@@ -176,7 +175,7 @@ const deleteEmployee = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("deleteEmployee error:", err);
-            return res.status(500).send("Internal server error");
+            return res.status(500).send("Error In Deleting the Employee");
         }
         res.status(200).json({ message: "Employee Deleted Successfully" });
     });
@@ -189,6 +188,7 @@ const changeEmployeeStatus = asyncHandler((req, res) => {
     dbConnect.query(createSql, (err, result) => {
         if (err) {
             console.log("changeEmployeeStatus error:");
+            return res.status(500).send("Error In Changing the Employee Status");
         }
         if (result && result[0] && statusId) {
             let statusData = {
@@ -200,6 +200,7 @@ const changeEmployeeStatus = asyncHandler((req, res) => {
             dbConnect.query(sql, (err, result) => {
                 if (err) {
                     console.log("changeEmployeeStatus and updatecalss error:");
+                    return res.status(500).send("Error In Updating the Employee Status");
                 }
                 res.status(200).send(true);
             });

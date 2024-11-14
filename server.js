@@ -19,6 +19,7 @@ app.use("/attendance", require("./routes/attendanceRoutes"));
 app.use("/leaves", require("./routes/leavemanagementRoutes"));
 app.use("/payroll", require("./routes/payrollRoutes"));
 app.use("/reports", require("./routes/reportsRoutes"));
+app.use("/mail", require("./routes/nodeMailRoutes"));
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running at http://localhost:${process.env.PORT}`);

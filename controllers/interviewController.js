@@ -16,6 +16,7 @@ const getInterviewCount = asyncHandler(async (req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getInterviewCount error");
+            return res.status(500).send("Error In fetching Interviews Count");
         }
         const interviewsCount = result[0]["interviewsCount"];
         res.status(200).send(String(interviewsCount));
@@ -25,12 +26,12 @@ const getInterviewCount = asyncHandler(async (req, res) => {
 const getInterviews = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM interviews";
     const queryParams = req.query;
-    // queryParams["sort"] = "scheduledDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getInterviews error:");
+            return res.status(500).send("Error In fetching Interviews");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result);
@@ -42,6 +43,7 @@ const getInterviewById = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getInterviewById error:");
+            return res.status(500).send("Error In fetching Interview Details");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result[0]);
@@ -50,13 +52,12 @@ const getInterviewById = asyncHandler((req, res) => {
 
 
 const createInterview = asyncHandler((req, res) => {
-
     const phoneNumber = req.body.primaryPhone;
     const checkPhoneQuery = `SELECT * FROM interviews WHERE primaryPhone = ?`;
     dbConnect.query(checkPhoneQuery, [phoneNumber], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
-            res.status(500).json({ error: "Internal server error" });
+            return res.status(500).send("Error in checking phone number");
         } else {
             if (result.length > 0) {
                 const interview = result[0];
@@ -74,10 +75,11 @@ const createInterview = asyncHandler((req, res) => {
                 req.body["createdBy"] = req.user.username;
                 req.body["lastUpdatedBy"] = req.user.username;
                 const createClause = createClauseHandler(req.body);
-                const sql = `INSERT INTO interviews (${createClause[0]}) VALUES (${createClause[1]})`;
+                const sql = `INSERT INTO interview (${createClause[0]}) VALUES (${createClause[1]})`;
                 dbConnect.query(sql, (err, result) => {
                     if (err) {
-                        console.log("createInterview error:");
+                        console.log("createInterview error:", err);
+                        return res.status(500).send("Error In creating Interview");
                     }
                     res.status(200).send(true);
                 });
@@ -97,7 +99,7 @@ const updateInterview = asyncHandler((req, res) => {
     dbConnect.query(checkPhoneQuery, [primaryPhone, id], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
-            return res.status(500).json({ error: "Internal server error" });
+            return res.status(500).send("Error in checking phone number");
         }
         if (result.length > 0) {
             const interview = result[0];
@@ -112,7 +114,7 @@ const updateInterview = asyncHandler((req, res) => {
         dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
             if (updateErr) {
                 console.error("updateInterview error:", updateErr);
-                return res.status(500).send("Internal server error");
+                return res.status(500).send("Error in Updating the Interview Details");
             }
             return res.status(200).send(updateResult);
         });
@@ -126,7 +128,7 @@ const deleteInterview = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("deleteInterview error:", err);
-            return res.status(500).send("Internal server error");
+            return res.status(500).send("Error in Deleting the Interview");
         }
         res.status(200).json({ message: "Interview Deleted Successfully" });
     });
@@ -139,6 +141,7 @@ const changeInterviewStatus = asyncHandler((req, res) => {
     dbConnect.query(createSql, (err, result) => {
         if (err) {
             console.log("changeInterviewStatus error:");
+            return res.status(500).send("Error in Changing the Interview Status");
         }
         if (result && result[0] && statusId) {
             let statusData = {
@@ -150,6 +153,7 @@ const changeInterviewStatus = asyncHandler((req, res) => {
             dbConnect.query(sql, (err, result) => {
                 if (err) {
                     console.log("changeInterviewStatus and updatecalss error:");
+                    return res.status(500).send("Error in Updating the Interview Status");
                 }
                 res.status(200).send(true);
             });

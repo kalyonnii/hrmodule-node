@@ -54,8 +54,7 @@ const exportEmployees = asyncHandler(async (req, res) => {
     dbConnect.query(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting Employees: ", err);
-            res.status(500).json({ error: "Internal server error" });
-            return;
+            return res.status(500).send("Error in Exporting the Employees");
         }
         try {
             console.log(result)
@@ -92,14 +91,12 @@ const exportEmployees = asyncHandler(async (req, res) => {
                     const fileUrl = response.data.links[0];
                     const fileUrlArray = JSON.stringify([fileUrl]);
                     const createdBy = req.user.username;
-
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
-                            res.status(500).json({ error: "Internal server error" });
-                            return;
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
                         }
                         console.log("Report URL inserted successfully into the database");
                         res.status(200).json({
@@ -110,15 +107,15 @@ const exportEmployees = asyncHandler(async (req, res) => {
                     });
                 } else {
                     console.warn("Server returned 200 status but no file URL in response.");
-                    res.status(500).json({ error: "Upload succeeded but no file URL returned" });
+                    return res.status(500).send("Upload succeeded but no file URL returned");
                 }
             } else {
                 console.error("Error uploading file:", response.data);
-                res.status(500).json({ error: "Error uploading file" });
+                return res.status(500).send("Error uploading file");
             }
         } catch (error) {
-            console.error("Error processing leads:", error);
-            res.status(500).json({ error: "Internal server error" });
+            console.error("Error processing Employees:", error);
+            res.status(500).send("Error processing Employees");
         } finally {
             cleanup(uploadDirectory, excelFilePath);
         }
@@ -139,8 +136,7 @@ const exportInterviews = asyncHandler(async (req, res) => {
     dbConnect.query(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting Interviews: ", err);
-            res.status(500).json({ error: "Internal server error" });
-            return;
+            return res.status(500).send("Error in Exporting the Interviews");
         }
         try {
             console.log(result)
@@ -177,14 +173,12 @@ const exportInterviews = asyncHandler(async (req, res) => {
                     const fileUrl = response.data.links[0];
                     const fileUrlArray = JSON.stringify([fileUrl]);
                     const createdBy = req.user.username;
-
                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
-                            res.status(500).json({ error: "Internal server error" });
-                            return;
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
                         }
                         console.log("Report URL inserted successfully into the database");
                         res.status(200).json({
@@ -195,15 +189,15 @@ const exportInterviews = asyncHandler(async (req, res) => {
                     });
                 } else {
                     console.warn("Server returned 200 status but no file URL in response.");
-                    res.status(500).json({ error: "Upload succeeded but no file URL returned" });
+                    return res.status(500).send("Upload succeeded but no file URL returned");
                 }
             } else {
                 console.error("Error uploading file:", response.data);
-                res.status(500).json({ error: "Error uploading file" });
+                return res.status(500).send("Error uploading file");
             }
         } catch (error) {
-            console.error("Error processing leads:", error);
-            res.status(500).json({ error: "Internal server error" });
+            console.error("Error processing Interviews:", error);
+            res.status(500).send("Error processing Interviews");
         } finally {
             cleanup(uploadDirectory, excelFilePath);
         }
@@ -225,8 +219,7 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
     dbConnect.query(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting Salary Sheet: ", err);
-            res.status(500).json({ error: "Internal server error" });
-            return;
+            return res.status(500).send("Error in Exporting the Salary Sheet");
         }
         try {
             console.log(result)
@@ -269,8 +262,7 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
-                            res.status(500).json({ error: "Internal server error" });
-                            return;
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
                         }
                         console.log("Report URL inserted successfully into the database");
                         res.status(200).json({
@@ -281,15 +273,15 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
                     });
                 } else {
                     console.warn("Server returned 200 status but no file URL in response.");
-                    res.status(500).json({ error: "Upload succeeded but no file URL returned" });
+                    return res.status(500).send("Upload succeeded but no file URL returned");
                 }
             } else {
                 console.error("Error uploading file:", response.data);
-                res.status(500).json({ error: "Error uploading file" });
+                return res.status(500).send("Error uploading file");
             }
         } catch (error) {
-            console.error("Error processing leads:", error);
-            res.status(500).json({ error: "Internal server error" });
+            console.error("Error processing Salary Sheet:", error);
+            res.status(500).send("Error processing Salary Sheet");
         } finally {
             cleanup(uploadDirectory, excelFilePath);
         }
@@ -311,8 +303,7 @@ const exportLeaves = asyncHandler(async (req, res) => {
     dbConnect.query(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting Leaves: ", err);
-            res.status(500).json({ error: "Internal server error" });
-            return;
+            return res.status(500).send("Error in Exporting the Leaves");
         }
         try {
             console.log(result)
@@ -354,8 +345,7 @@ const exportLeaves = asyncHandler(async (req, res) => {
                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
-                            res.status(500).json({ error: "Internal server error" });
-                            return;
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
                         }
                         console.log("Report URL inserted successfully into the database");
                         res.status(200).json({
@@ -366,15 +356,15 @@ const exportLeaves = asyncHandler(async (req, res) => {
                     });
                 } else {
                     console.warn("Server returned 200 status but no file URL in response.");
-                    res.status(500).json({ error: "Upload succeeded but no file URL returned" });
+                    return res.status(500).send("Upload succeeded but no file URL returned");
                 }
             } else {
                 console.error("Error uploading file:", response.data);
-                res.status(500).json({ error: "Error uploading file" });
+                return res.status(500).send("Error uploading file");
             }
         } catch (error) {
-            console.error("Error processing leads:", error);
-            res.status(500).json({ error: "Internal server error" });
+            console.error("Error processing Leaves:", error);
+            res.status(500).send("Error processing Leaves");
         } finally {
             cleanup(uploadDirectory, excelFilePath);
         }
@@ -395,8 +385,7 @@ const exportHolidays = asyncHandler(async (req, res) => {
     dbConnect.query(sql, async (err, result) => {
         if (err) {
             console.error("Error exporting Holidays: ", err);
-            res.status(500).json({ error: "Internal server error" });
-            return;
+            return res.status(500).send("Error in Exporting the Holidays");
         }
         try {
             console.log(result)
@@ -438,8 +427,7 @@ const exportHolidays = asyncHandler(async (req, res) => {
                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
                             console.error("Error inserting report URL into the database:", insertErr);
-                            res.status(500).json({ error: "Internal server error" });
-                            return;
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
                         }
                         console.log("Report URL inserted successfully into the database");
                         res.status(200).json({
@@ -450,18 +438,207 @@ const exportHolidays = asyncHandler(async (req, res) => {
                     });
                 } else {
                     console.warn("Server returned 200 status but no file URL in response.");
-                    res.status(500).json({ error: "Upload succeeded but no file URL returned" });
+                    return res.status(500).send("Upload succeeded but no file URL returned");
                 }
             } else {
                 console.error("Error uploading file:", response.data);
-                res.status(500).json({ error: "Error uploading file" });
+                return res.status(500).send("Error uploading file");
             }
         } catch (error) {
-            console.error("Error processing leads:", error);
-            res.status(500).json({ error: "Internal server error" });
+            console.error("Error processing Holidays:", error);
+            res.status(500).send("Error processing Holidays");
         } finally {
             cleanup(uploadDirectory, excelFilePath);
         }
+    });
+});
+
+
+
+
+const exportAttendance = asyncHandler(async (req, res) => {
+    let reportId = "R-" + generateRandomNumber(6);
+    let sql = "SELECT * FROM attendance";
+    const queryParams = req.query;
+    queryParams["sort"] = "createdOn";
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+
+    const uploadDirectory = path.join(__dirname, '../excelFiles');
+    const excelFileName = 'attendance1.xlsx';
+    const excelFilePath = path.join(uploadDirectory, excelFileName);
+
+    dbConnect.query(sql, async (err, attendanceRecords) => {
+        if (err) {
+            console.error("Error fetching attendance records:", err);
+            return res.status(500).send("Error fetching attendance records");
+        }
+        if (attendanceRecords.length === 0) {
+            return res.status(404).send("No attendance records found.");
+        }
+
+        const employeeQuery = "SELECT employeeId, employeeName, joiningDate, designationName, customEmployeeId FROM employees";
+        dbConnect.query(employeeQuery, async (err, employeeRecords) => {
+            if (err) {
+                console.error("Error fetching employee records:", err);
+                return res.status(500).send("Error fetching employee records");
+            }
+            try {
+                const employeeDataMap = {};
+                employeeRecords.forEach(record => {
+                    employeeDataMap[record.employeeId] = {
+                        employeeName: record.employeeName,
+                        joiningDate: moment(record.joiningDate).format('YYYY-MM-DD'),
+                        designationName: record.designationName,
+                        customEmployeeId: record.customEmployeeId
+                    };
+                });
+                const formattedAttendanceData = attendanceRecords.map(record => {
+                    return {
+                        attendanceId: record.attendanceId,
+                        attendanceDate: moment(record.attendanceDate).format('YYYY-MM-DD'),
+                        attendanceData: JSON.parse(record.attendanceData).map(data => {
+                            const employeeDetails = employeeDataMap[data.employeeId] || {};
+                            return {
+                                employeeId: data.employeeId,
+                                employeeName: employeeDetails.employeeName,
+                                joiningDate: employeeDetails.joiningDate,
+                                designationName: employeeDetails.designationName,
+                                customEmployeeId: employeeDetails.customEmployeeId,
+                                status: data.status,
+                                checkInTime: data.checkInTime,
+                                checkOutTime: data.checkOutTime,
+                            };
+                        })
+                    };
+                });
+                const flattenedData = [];
+                formattedAttendanceData.forEach(record => {
+                    record.attendanceData.forEach(data => {
+                        flattenedData.push({
+                            attendanceId: record.attendanceId,
+                            attendanceDate: record.attendanceDate,
+                            employeeName: data.employeeName,
+                            employeeId: data.employeeId,
+                            joiningDate: data.joiningDate,
+                            designationName: data.designationName,
+                            customEmployeeId: data.customEmployeeId,
+                            status: data.status,
+                            checkInTime: data.checkInTime,
+                            checkOutTime: data.checkOutTime,
+                        });
+                    });
+                });
+                if (!fs.existsSync(uploadDirectory)) {
+                    fs.mkdirSync(uploadDirectory, { recursive: true });
+                }
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Attendance');
+                worksheet.columns = [
+                    { header: "Attendance Id", key: "attendanceId" },
+                    { header: "Employee ID", key: "employeeId" },
+                    { header: "Attendance Date", key: "attendanceDate" },
+                    { header: "Employee Name", key: "employeeName" },
+                    { header: "Custom Employee ID", key: "customEmployeeId" },
+                    { header: "Joining Date", key: "joiningDate" },
+                    { header: "Designation", key: "designationName" },
+                    { header: "Status", key: "status" },
+                    { header: "Check-In Time", key: "checkInTime" },
+                    { header: "Check-Out Time", key: "checkOutTime" },
+                ];
+                worksheet.addRows(flattenedData);
+                await workbook.xlsx.writeFile(excelFilePath);
+                console.log("Excel file created successfully at", excelFilePath);
+                const fileContent = fs.readFileSync(excelFilePath);
+                const FormData = require('form-data');
+                const formData = new FormData();
+                formData.append('files', fileContent, {
+                    filename: excelFileName,
+                    contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                });
+                const type = 'ATTENDANCE';
+                const employeeId = 'REPORTS';
+                const url = `https://hrfiles.thefintalk.in/hrfiles?type=${type}&employeeId=${employeeId}`;
+                const response = await axios.post(url, formData, {
+                    headers: {
+                        ...formData.getHeaders(),
+                    },
+                });
+                if (response.status === 200) {
+                    if (response.data && response.data.links && response.data.links.length > 0) {
+                        const fileUrl = response.data.links[0];
+                        const fileUrlArray = JSON.stringify([fileUrl]);
+                        const createdBy = req.user.username;
+                        const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?, ?)";
+                        const values = [reportId, type, fileUrlArray, createdBy];
+                        dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                            if (insertErr) {
+                                console.error("Error inserting report URL into the database:", insertErr);
+                                return res.status(500).send("Error in Inserting the Reports Data with Url");
+                            }
+                            console.log("Report URL inserted successfully into the database");
+                            res.status(200).json({
+                                success: true,
+                                message: 'File uploaded successfully',
+                                fileUrl: fileUrl,
+                            });
+                        });
+                    } else {
+                        console.warn("Server returned 200 status but no file URL in response.");
+                        return res.status(500).send("Upload succeeded but no file URL returned");
+                    }
+                } else {
+                    console.error("Error uploading file:", response.data);
+                    return res.status(500).send("Error uploading file");
+                }
+            } catch (error) {
+                console.error("Error processing Attendance:", error);
+                res.status(500).send("Error processing Attendance");
+            } finally {
+                cleanup(uploadDirectory, excelFilePath);
+            }
+        });
+    });
+});
+
+const getReports = asyncHandler(async (req, res) => {
+    let sql = "SELECT * FROM reports";
+    const queryParams = req.query;
+    queryParams["sort"] = "createdOn";
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("getReports Error in controller");
+            return res.status(500).send("Error in Fetching the Reports");
+        }
+        let reportsData = parseNestedJSON(result);
+        res.status(200).send(reportsData);
+    });
+});
+const getReportsCount = asyncHandler(async (req, res) => {
+    let sql = "SELECT count(*) as reportCount FROM reports";
+    const filtersQuery = handleGlobalFilters(req.query, true);
+    sql += filtersQuery;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("Error in getUsersCount:", err);
+            return res.status(500).send("Error in Fetching the Reports Count");
+        }
+        const reportsCount = result[0]["reportCount"];
+        res.status(200).send(String(reportsCount));
+    });
+});
+
+const deleteReport = asyncHandler((req, res) => {
+    console.log(req.params)
+    const sql = `DELETE FROM reports WHERE reportId = '${req.params.id}'`;
+    dbConnect.query(sql, (err, result) => {
+        if (err) {
+            console.log("deleteReport error:", err);
+            return res.status(500).send("Error In Deleting the Report");
+        }
+        res.status(200).json({ message: "Report Deleted Successfully" });
     });
 });
 module.exports = {
@@ -469,6 +646,9 @@ module.exports = {
     exportInterviews,
     exportSalarySheet,
     exportLeaves,
-    exportHolidays
-
+    exportHolidays,
+    getReports,
+    getReportsCount,
+    deleteReport,
+    exportAttendance
 };

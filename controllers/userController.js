@@ -3,7 +3,6 @@ const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const userLogin = asyncHandler(async (req, res) => {
-    console.log(req.body)
     const { username, encryptedPassword } = req.body;
     if (!username || !encryptedPassword) {
         res.status(400).send("Please Enter Username and Password");
@@ -13,14 +12,12 @@ const userLogin = asyncHandler(async (req, res) => {
         if (err) {
             console.log("adminlogin error in controller");
         }
-        console.log(result)
         if (
             result &&
             result.length == 1 &&
             (await bcrypt.compare(encryptedPassword, result[0].encryptedPassword))
         ) {
             const user = result[0];
-            console.log(user)
             const accessToken = jwt.sign(
                 {
                     user: user,

@@ -17,6 +17,7 @@ const getUsersCount = asyncHandler(async (req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getUsersCount error");
+            return res.status(500).send("Error in Fetching the Users Count");
         }
         const usersCount = result[0]["usersCount"];
         res.status(200).send(String(usersCount));
@@ -26,12 +27,12 @@ const getUsersCount = asyncHandler(async (req, res) => {
 const getUsers = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM users";
     const queryParams = req.query;
-    // queryParams["sort"] = "employeeInternalStatus,asc";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getUsers error:");
+            return res.status(500).send("Error in Fetching the Users");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result);
@@ -43,6 +44,7 @@ const getUserById = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getUserById error:");
+            return res.status(500).send("Error in Fetching the User Details");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result[0]);
@@ -51,7 +53,6 @@ const getUserById = asyncHandler((req, res) => {
 
 
 const createUser = asyncHandler(async (req, res) => {
-    // let userId = generateRandomNumber(9);
     let userId = "U-" + generateRandomNumber(6);
     let password = req.body.password;
     let encryptedPassword = await bcrypt.hash(password, 12);
@@ -63,10 +64,8 @@ const createUser = asyncHandler(async (req, res) => {
     dbConnect.query(checkIfExistsQuery, [req.body.username], (err, results) => {
         if (err) {
             console.error("Error checking if user exists:", err);
-            res.status(500).send("Internal Server Error");
-            return;
+            return res.status(500).send("Error in Checking Username");
         }
-        console.log("results", results)
         if (results.length > 0) {
             res.status(400).send("Username already exists");
             return;
@@ -76,6 +75,7 @@ const createUser = asyncHandler(async (req, res) => {
         dbConnect.query(sql, (err, result) => {
             if (err) {
                 console.log("createUser error:");
+                return res.status(500).send("Error in Creating the User");
             }
             res.status(200).send(true);
         });
@@ -91,26 +91,36 @@ const updateUser = asyncHandler(async (req, res) => {
     let password = req.body.password.toString();
     let encryptedPassword = await bcrypt.hash(password, 12);
     req.body["encryptedPassword"] = encryptedPassword;
-    const updateClause = updateClauseHandler(req.body);
-    const updateSql = `UPDATE users SET ${updateClause} WHERE userId = ?`;
-    dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
-        if (updateErr) {
-            console.error("updateUser error:", updateErr);
-            return res.status(500).send("Internal server error");
+    const checkIfExistsQuery = `SELECT * FROM users WHERE username = ? AND userId !=?`;
+    dbConnect.query(checkIfExistsQuery, [req.body.username, id], (err, results) => {
+        if (err) {
+            console.error("Error checking if user exists:", err);
+            return res.status(500).send("Error in Checking Username");
         }
-        return res.status(200).send(updateResult);
+        if (results.length > 0) {
+            res.status(400).send("Username already exists");
+            return;
+        }
+        const updateClause = updateClauseHandler(req.body);
+        const updateSql = `UPDATE users SET ${updateClause} WHERE userId = ?`;
+        dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
+            if (updateErr) {
+                console.error("updateUser error:", updateErr);
+                return res.status(500).send("Error in Updating User");
+            }
+            return res.status(200).send(updateResult);
+        });
     });
 });
 
 
 
 const deleteUser = asyncHandler((req, res) => {
-    console.log(req.params)
     const sql = `DELETE FROM users WHERE userId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("deleteUser error:", err);
-            return res.status(500).send("Internal server error");
+            return res.status(500).send("Error in Deleting User");
         }
         res.status(200).json({ message: "User Deleted Successfully" });
     });

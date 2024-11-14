@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-// Create the directory for saving PDFs if it doesn't exist
 const pdfOutputDir = path.join(__dirname, '../pdfs');
 if (!fs.existsSync(pdfOutputDir)) {
     fs.mkdirSync(pdfOutputDir);
@@ -33,9 +32,8 @@ const generatePdf = async (req, res) => {
             year
         } = req.body;
 
-        console.log(req.body); // Debugging
+        console.log(req.body); 
 
-        // Read and modify the HTML template
         const templatePath = path.join(__dirname, '../pdfFormatTemplates', 'payslipformat.html');
         let template = fs.readFileSync(templatePath, 'utf-8');
         template = template
@@ -59,10 +57,9 @@ const generatePdf = async (req, res) => {
             .replace('{{month}}', month)
             .replace('{{year}}', year);
 
-        // Generate PDF using Puppeteer
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-        await page.setContent(template, { waitUntil: 'networkidle0' }); // Wait for content to load
+        await page.setContent(template, { waitUntil: 'networkidle0' }); 
         const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
 
         console.log(`PDF Buffer Length: ${pdfBuffer.length}`);
@@ -72,7 +69,7 @@ const generatePdf = async (req, res) => {
         console.log(`PDF saved at: ${outputFilePath}`);
         res.setHeader('Content-Disposition', `attachment; filename=${employeeId}_payslip.pdf`);
         res.setHeader('Content-Type', 'application/pdf');
-        res.send(pdfBuffer); // Send the buffer as response
+        res.send(pdfBuffer); 
         console.log('PDF sent to client');
     } catch (error) {
         console.error('Error generating PDF:', error);

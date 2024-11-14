@@ -17,6 +17,7 @@ const getLeavesCount = asyncHandler(async (req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getLeavesCount error");
+            return res.status(500).send("Error in Fetching the Leaves Count");
         }
         const leavesCount = result[0]["leavesCount"];
         res.status(200).send(String(leavesCount));
@@ -31,6 +32,7 @@ const getLeaves = asyncHandler(async (req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getLeaves error:");
+            return res.status(500).send("Error in Fetching the Leaves");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result);
@@ -42,6 +44,7 @@ const getLeaveById = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getLeaveById error:");
+            return res.status(500).send("Error in Fetching the Leave Details");
         }
         result = parseNestedJSON(result);
         res.status(200).send(result[0]);
@@ -55,12 +58,12 @@ const createLeave = asyncHandler((req, res) => {
     req.body["leaveInternalStatus"] = 1;
     req.body["lastLeaveInternalStatus"] = 1;
     req.body["createdBy"] = req.user.username;
-
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO leavemanagement (${createClause[0]}) VALUES (${createClause[1]})`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("createLeave error:");
+            return res.status(500).send("Error in Creating the Leave");
         }
         res.status(200).send(true);
     });
@@ -77,7 +80,7 @@ const updateLeave = asyncHandler((req, res) => {
     dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
         if (updateErr) {
             console.error("updateLeave error:", updateErr);
-            return res.status(500).send("Internal server error");
+            return res.status(500).send("Error in Updating the Leave");
         }
         return res.status(200).send(updateResult);
     });
@@ -91,7 +94,7 @@ const deleteLeave = asyncHandler((req, res) => {
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("deleteLeave error:", err);
-            return res.status(500).send("Internal server error");
+            return res.status(500).send("Error in Deleting the Leave");
         }
         res.status(200).json({ message: "Leave Deleted Successfully" });
     });
@@ -104,6 +107,7 @@ const changeLeaveStatus = asyncHandler((req, res) => {
     dbConnect.query(createSql, (err, result) => {
         if (err) {
             console.log("changeLeaveStatus error:");
+            return res.status(500).send("Error in Changing the Leave Status");
         }
         if (result && result[0] && statusId) {
             let statusData = {
@@ -115,6 +119,7 @@ const changeLeaveStatus = asyncHandler((req, res) => {
             dbConnect.query(sql, (err, result) => {
                 if (err) {
                     console.log("changeLeaveStatus and updatecalss error:");
+                    return res.status(500).send("Error in Updating the Leave Status");
                 }
                 res.status(200).send(true);
             });
