@@ -73,7 +73,7 @@ const createAttendance = asyncHandler((req, res) => {
                 req.body["attendanceId"] = attendanceId;
                 req.body["createdBy"] = req.user.username;
                 const createClause = createClauseHandler(req.body);
-                const sql = `INSERT INTO attendanc (${createClause[0]}) VALUES (${createClause[1]})`;
+                const sql = `INSERT INTO attendance (${createClause[0]}) VALUES (${createClause[1]})`;
                 dbConnect.query(sql, (err, result) => {
                     if (err) {
                         console.log("createAttendance error:");

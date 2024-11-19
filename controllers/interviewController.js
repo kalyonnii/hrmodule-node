@@ -75,7 +75,7 @@ const createInterview = asyncHandler((req, res) => {
                 req.body["createdBy"] = req.user.username;
                 req.body["lastUpdatedBy"] = req.user.username;
                 const createClause = createClauseHandler(req.body);
-                const sql = `INSERT INTO interview (${createClause[0]}) VALUES (${createClause[1]})`;
+                const sql = `INSERT INTO interviews (${createClause[0]}) VALUES (${createClause[1]})`;
                 dbConnect.query(sql, (err, result) => {
                     if (err) {
                         console.log("createInterview error:", err);

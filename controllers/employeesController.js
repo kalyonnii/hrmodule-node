@@ -27,7 +27,7 @@ const getEmployeesCount = asyncHandler(async (req, res) => {
 
 const createEmployeeFromInterview = asyncHandler((req, res) => {
     const phoneNumber = req.body.primaryPhone;
-    const checkPhoneQuery = `SELECT * FROM employee WHERE primaryPhone = ?`;
+    const checkPhoneQuery = `SELECT * FROM employees WHERE primaryPhone = ?`;
     dbConnect.query(checkPhoneQuery, [phoneNumber], (err, result) => {
         if (err) {
             console.error("Error checking phone number:", err);
@@ -174,7 +174,7 @@ const deleteEmployee = asyncHandler((req, res) => {
     const sql = `DELETE FROM employees WHERE employeeId = ${req.params.id}`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
-            console.log("deleteEmployee error:", err);
+            console.log("DeleteEmployee error:", err);
             return res.status(500).send("Error In Deleting the Employee");
         }
         res.status(200).json({ message: "Employee Deleted Successfully" });
@@ -187,7 +187,7 @@ const changeEmployeeStatus = asyncHandler((req, res) => {
     const createSql = `SELECT * FROM employees WHERE employeeId = ${id}`;
     dbConnect.query(createSql, (err, result) => {
         if (err) {
-            console.log("changeEmployeeStatus error:");
+            console.log("ChangeEmployeeStatus error:");
             return res.status(500).send("Error In Changing the Employee Status");
         }
         if (result && result[0] && statusId) {
@@ -199,7 +199,7 @@ const changeEmployeeStatus = asyncHandler((req, res) => {
             const sql = `UPDATE employees SET ${updateClause} WHERE employeeId = ${id}`;
             dbConnect.query(sql, (err, result) => {
                 if (err) {
-                    console.log("changeEmployeeStatus and updatecalss error:");
+                    console.log("ChangeEmployeeStatus and updatecalss error:");
                     return res.status(500).send("Error In Updating the Employee Status");
                 }
                 res.status(200).send(true);
