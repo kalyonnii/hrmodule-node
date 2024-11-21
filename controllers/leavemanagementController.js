@@ -13,7 +13,7 @@ const getLeavesCount = asyncHandler(async (req, res) => {
     let sql = "SELECT count(*) as leavesCount FROM leavemanagement";
     const filtersQuery = handleGlobalFilters(req.query, true);
     sql += filtersQuery;
-    console.log(sql);
+    // console.log(sql);
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getLeavesCount error");
@@ -89,7 +89,7 @@ const updateLeave = asyncHandler((req, res) => {
 
 
 const deleteLeave = asyncHandler((req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const sql = `DELETE FROM leavemanagement WHERE leaveId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

@@ -11,10 +11,10 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendTerminationmail = asyncHandler(async (req, res) => {
-    const { subject, body, employeeName } = req.body;
+    const { subject, body, employeeName, mobile ,email} = req.body;
     const mailOptions = {
         from: process.env.EMAIL_USER,
-        to: 'mudhiiguubbakalyonnii4@gmail.com',
+        to: email,
         subject: subject,
         html: `
         <p>Dear ${employeeName},</p>
@@ -28,7 +28,7 @@ const sendTerminationmail = asyncHandler(async (req, res) => {
       <br />
       <p>Regards,</p>
       <p>Team - HR Dept</p>
-      <p>+91 903-022-7331</p>
+      <p>+91 ${mobile}</p>
       <p>hr@winwaycreators.com</p>
       <p><a href="https://www.winwaycreators.com">www.winwaycreators.com</a></p>
        

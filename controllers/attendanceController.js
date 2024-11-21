@@ -53,7 +53,7 @@ const getAttendanceById = asyncHandler((req, res) => {
 
 const createAttendance = asyncHandler((req, res) => {
     const date = req.body.attendanceDate;
-    console.log(date)
+    // console.log(date)
     const checkPhoneQuery = `SELECT * FROM attendance WHERE attendanceDate = ?`;
     dbConnect.query(checkPhoneQuery, [date], (err, result) => {
         if (err) {
@@ -89,8 +89,8 @@ const createAttendance = asyncHandler((req, res) => {
 const updateAttendance = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const { attendanceDate, attendanceData } = req.body;
-    console.log(id)
-    console.log(attendanceDate)
+    // console.log(id)
+    // console.log(attendanceDate)
     const checkRequiredFields = handleRequiredFields("attendance", req.body);
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
@@ -103,7 +103,7 @@ const updateAttendance = asyncHandler(async (req, res) => {
         }
         if (result.length > 0) {
             const attendance = result[0];
-            console.log(attendance)
+            // console.log(attendance)
             return res
                 .status(409)
                 .send(
@@ -126,7 +126,7 @@ const updateAttendance = asyncHandler(async (req, res) => {
 
 
 const deleteAttendance = asyncHandler((req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const sql = `DELETE FROM attendance WHERE attendanceId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

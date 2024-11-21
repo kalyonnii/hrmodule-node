@@ -39,7 +39,7 @@ const getPayroll = asyncHandler(async (req, res) => {
 });
 
 const getPayrollById = asyncHandler((req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const sql = `SELECT * FROM payroll WHERE payslipId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
@@ -128,7 +128,7 @@ const updatePayroll = asyncHandler(async (req, res) => {
 
 
 const deletePayroll = asyncHandler((req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const sql = `DELETE FROM payroll WHERE payslipId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

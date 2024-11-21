@@ -123,7 +123,7 @@ const updateInterview = asyncHandler((req, res) => {
 
 
 const deleteInterview = asyncHandler((req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const sql = `DELETE FROM interviews WHERE interviewId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
