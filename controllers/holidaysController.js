@@ -55,6 +55,7 @@ const createHoliday = asyncHandler((req, res) => {
     let holidayId = "H-" + generateRandomNumber(6);
     req.body["holidayId"] = holidayId;
     req.body["createdBy"] = req.user.username;
+    req.body["lastUpdatedBy"] = req.user.username;
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO holidays (${createClause[0]}) VALUES (${createClause[1]})`;
     dbConnect.query(sql, (err, result) => {
@@ -72,6 +73,7 @@ const updateHoliday = asyncHandler((req, res) => {
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
     }
+    req.body["lastUpdatedBy"] = req.user.username;
     const updateClause = updateClauseHandler(req.body);
     const updateSql = `UPDATE holidays SET ${updateClause} WHERE holidayId = ?`;
     dbConnect.query(updateSql, [id], (updateErr, updateResult) => {

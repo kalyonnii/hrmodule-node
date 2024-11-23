@@ -101,6 +101,7 @@ const updateUser = asyncHandler(async (req, res) => {
             res.status(400).send("Username already exists");
             return;
         }
+        req.body["lastUpdatedBy"] = req.user.username;
         const updateClause = updateClauseHandler(req.body);
         const updateSql = `UPDATE users SET ${updateClause} WHERE userId = ?`;
         dbConnect.query(updateSql, [id], (updateErr, updateResult) => {

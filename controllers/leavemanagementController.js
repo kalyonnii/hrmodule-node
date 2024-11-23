@@ -58,6 +58,7 @@ const createLeave = asyncHandler((req, res) => {
     req.body["leaveInternalStatus"] = 1;
     req.body["lastLeaveInternalStatus"] = 1;
     req.body["createdBy"] = req.user.username;
+    req.body["lastUpdatedBy"] = req.user.username;
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO leavemanagement (${createClause[0]}) VALUES (${createClause[1]})`;
     dbConnect.query(sql, (err, result) => {
@@ -75,6 +76,7 @@ const updateLeave = asyncHandler((req, res) => {
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
     }
+    req.body["lastUpdatedBy"] = req.user.username;
     const updateClause = updateClauseHandler(req.body);
     const updateSql = `UPDATE leavemanagement SET ${updateClause} WHERE leaveId = ?`;
     dbConnect.query(updateSql, [id], (updateErr, updateResult) => {

@@ -55,6 +55,7 @@ const createIncentive = asyncHandler((req, res) => {
     let incentiveId = "C-" + generateRandomNumber(6);
     req.body["incentiveId"] = incentiveId;
     req.body["createdBy"] = req.user.username;
+    req.body["lastUpdatedBy"] = req.user.username;
     const createClause = createClauseHandler(req.body);
     const sql = `INSERT INTO incentives (${createClause[0]}) VALUES (${createClause[1]})`;
     dbConnect.query(sql, (err, result) => {
@@ -72,6 +73,7 @@ const updateIncentive = asyncHandler((req, res) => {
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
     }
+    req.body["lastUpdatedBy"] = req.user.username;
     const updateClause = updateClauseHandler(req.body);
     const updateSql = `UPDATE incentives SET ${updateClause} WHERE incentiveId = ?`;
     dbConnect.query(updateSql, [id], (updateErr, updateResult) => {

@@ -72,6 +72,7 @@ const createAttendance = asyncHandler((req, res) => {
                 let attendanceId = "A-" + generateRandomNumber(6);
                 req.body["attendanceId"] = attendanceId;
                 req.body["createdBy"] = req.user.username;
+                req.body["lastUpdatedBy"] = req.user.username;
                 const createClause = createClauseHandler(req.body);
                 const sql = `INSERT INTO attendance (${createClause[0]}) VALUES (${createClause[1]})`;
                 dbConnect.query(sql, (err, result) => {
@@ -110,10 +111,11 @@ const updateAttendance = asyncHandler(async (req, res) => {
                     `Attendance already exists with Attendance Date ${attendanceDate}, created by - ${attendance.createdBy}, Attendance ID - ${attendance.attendanceId}`
                 );
         }
+        const lastupdatedby = req.user.username;
         const updateSql = `UPDATE attendance 
-                           SET attendanceDate = ?, attendanceData = ? 
+                           SET attendanceDate = ?, attendanceData = ? , lastUpdatedBy = ?
                            WHERE attendanceId = ?`;
-        const values = [attendanceDate, JSON.stringify(attendanceData), id];
+        const values = [attendanceDate, JSON.stringify(attendanceData), lastupdatedby, id];
         dbConnect.query(updateSql, values, (updateErr, updateResult) => {
             if (updateErr) {
                 console.error("updateAttendance error:", updateErr);

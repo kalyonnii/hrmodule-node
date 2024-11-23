@@ -135,8 +135,6 @@ const createEmployee = asyncHandler((req, res) => {
 const updateEmployee = asyncHandler((req, res) => {
     const id = req.params.id;
     const { primaryPhone } = req.body;
-    // console.log(primaryPhone)
-    // console.log(id)
     const checkRequiredFields = handleRequiredFields("employees", req.body);
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
@@ -155,6 +153,7 @@ const updateEmployee = asyncHandler((req, res) => {
                     `Employee already exists with phone number ${primaryPhone}, created by - ${employee.createdBy}, Employee ID - ${employee.employeeId}, Employee Name - ${employee.employeeName}`
                 );
         }
+        req.body["lastUpdatedBy"] = req.user.username;
         const updateClause = updateClauseHandler(req.body);
         const updateSql = `UPDATE employees SET ${updateClause} WHERE employeeId = ?`;
         dbConnect.query(updateSql, [id], (updateErr, updateResult) => {

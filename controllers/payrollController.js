@@ -74,6 +74,7 @@ const createPayroll = asyncHandler(async (req, res) => {
                 let payslipId = "P-" + generateRandomNumber(6);
                 req.body["payslipId"] = payslipId;
                 req.body["createdBy"] = req.user.username;
+                req.body["lastUpdatedBy"] = req.user.username;
                 const createClause = createClauseHandler(req.body);
                 const sql = `INSERT INTO payroll (${createClause[0]}) VALUES (${createClause[1]})`;
                 dbConnect.query(sql, (err, result) => {
@@ -112,6 +113,7 @@ const updatePayroll = asyncHandler(async (req, res) => {
                         Employee Id - ${employeeId}, created by - ${payroll.createdBy}`
                 );
         }
+        req.body["lastUpdatedBy"] = req.user.username;
         const updateClause = updateClauseHandler(req.body);
         const updateSql = `UPDATE payroll SET ${updateClause} WHERE payslipId = ?`;
         dbConnect.query(updateSql, [id], (updateErr, updateResult) => {

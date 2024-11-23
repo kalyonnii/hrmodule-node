@@ -109,6 +109,7 @@ const updateInterview = asyncHandler((req, res) => {
                     `Interview already exists with phone number ${primaryPhone}, created by - ${interview.createdBy}, Interview ID - ${interview.interviewId}, Candidate Name - ${interview.candidateName}`
                 );
         }
+        req.body["lastUpdatedBy"] = req.user.username;
         const updateClause = updateClauseHandler(req.body);
         const updateSql = `UPDATE interviews SET ${updateClause} WHERE interviewId = ?`;
         dbConnect.query(updateSql, [id], (updateErr, updateResult) => {
