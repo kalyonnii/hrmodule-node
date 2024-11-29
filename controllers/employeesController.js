@@ -43,7 +43,6 @@ const createEmployeeFromInterview = asyncHandler((req, res) => {
                     );
             } else {
                 let employeeId = generateRandomNumber(9);
-                // console.log(req.body)
                 req.body["employeeId"] = employeeId;
                 req.body["employeeInternalStatus"] = 1;
                 req.body["lastEmployeeInternalStatus"] = 1;
@@ -56,7 +55,6 @@ const createEmployeeFromInterview = asyncHandler((req, res) => {
                         console.log("createEmployeeFromInterview error:", err);
                         return res.status(500).send("Error in Creating Employee From Interview");
                     }
-                    // console.log(employeeId)
                     res.status(200).json({ id: employeeId });
                 });
             }
@@ -68,10 +66,8 @@ const createEmployeeFromInterview = asyncHandler((req, res) => {
 const getEmployees = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM employees";
     const queryParams = req.query;
-    // console.log(queryParams)
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    // console.log(sql)
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getEmployees error:");
@@ -161,7 +157,6 @@ const updateEmployee = asyncHandler((req, res) => {
                 console.error("updateEmployee error:", updateErr);
                 return res.status(500).send("Error in Updating the Employee Details");
             }
-            // console.log(updateResult);
             return res.status(200).send(updateResult);
         });
     });
@@ -169,7 +164,6 @@ const updateEmployee = asyncHandler((req, res) => {
 
 
 const deleteEmployee = asyncHandler((req, res) => {
-    // console.log(req.params)
     const sql = `DELETE FROM employees WHERE employeeId = ${req.params.id}`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

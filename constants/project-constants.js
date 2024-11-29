@@ -119,5 +119,16 @@ module.exports = {
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
         ],
+        INCENTIVE_WORKSHEET_COLUMNS: [
+            { header: "Incentive Id", key: "incentiveId" },
+            { header: "Employee Name", key: "employeeName" },
+            { header: "Incentive Amount", key: "incentiveAmount" },
+            { header: "Incentive Applicable Month", key: "incentiveApplicableMonth" },
+            { header: "First Month Files", key: "firstMonthFiles" },
+            { header: "Second Month Files", key: "secondMonthFiles" },
+            { header: "Third Month Files", key: "thirdMonthFiles" },
+            { header: "Created By", key: "createdBy" },
+            { header: "Created On", key: "createdOn" },
+        ]
     },
 };

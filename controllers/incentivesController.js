@@ -88,7 +88,6 @@ const updateIncentive = asyncHandler((req, res) => {
 
 
 const deleteIncentive = asyncHandler((req, res) => {
-    // console.log(req.params)
     const sql = `DELETE FROM incentives WHERE incentiveId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

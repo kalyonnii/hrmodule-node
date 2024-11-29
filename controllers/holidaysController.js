@@ -88,7 +88,6 @@ const updateHoliday = asyncHandler((req, res) => {
 
 
 const deleteHoliday = asyncHandler((req, res) => {
-    // console.log(req.params)
     const sql = `DELETE FROM holidays WHERE holidayId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

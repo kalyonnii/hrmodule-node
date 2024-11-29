@@ -463,7 +463,6 @@ const exportAttendance = asyncHandler(async (req, res) => {
     queryParams["sort"] = "createdOn";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-
     const uploadDirectory = path.join(__dirname, '../excelFiles');
     const excelFileName = 'attendance1.xlsx';
     const excelFilePath = path.join(uploadDirectory, excelFileName);
@@ -476,7 +475,6 @@ const exportAttendance = asyncHandler(async (req, res) => {
         if (attendanceRecords.length === 0) {
             return res.status(404).send("No attendance records found.");
         }
-
         const employeeQuery = "SELECT employeeId, employeeName, joiningDate, designationName, customEmployeeId FROM employees";
         dbConnect.query(employeeQuery, async (err, employeeRecords) => {
             if (err) {
@@ -601,6 +599,87 @@ const exportAttendance = asyncHandler(async (req, res) => {
     });
 });
 
+
+const exportIncentives = asyncHandler(async (req, res) => {
+    let reportId = "R-" + generateRandomNumber(6);
+    let sql = "SELECT * FROM incentives";
+    const queryParams = req.query;
+    queryParams["sort"] = "createdOn";
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+    const uploadDirectory = path.join(__dirname, '../excelFiles');
+    const excelFileName = 'incentives1.xlsx';
+    const excelFilePath = path.join(uploadDirectory, excelFileName);
+    dbConnect.query(sql, async (err, result) => {
+        if (err) {
+            console.error("Error exporting Incentives: ", err);
+            return res.status(500).send("Error in Exporting the Incentives");
+        }
+        try {
+            console.log(result)
+            for (let i = 0; i < result.length; i++) {
+                result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+            }
+            result = parseNestedJSON(result);
+            if (!fs.existsSync(uploadDirectory)) {
+                fs.mkdirSync(uploadDirectory, { recursive: true });
+            }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Incentives');
+            worksheet.columns = projectConstantsLocal.INCENTIVE_WORKSHEET_COLUMNS;
+            worksheet.addRows(result);
+            await workbook.xlsx.writeFile(excelFilePath);
+            console.log("Excel file created successfully at", excelFilePath);
+            const fileContent = fs.readFileSync(excelFilePath);
+            const FormData = require('form-data');
+            const formData = new FormData();
+            formData.append('files', fileContent, {
+                filename: excelFileName,
+                contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+            const type = 'INCENTIVES';
+            const employeeId = 'REPORTS';
+            const url = `https://hrfiles.thefintalk.in/hrfiles?type=${type}&employeeId=${employeeId}`;
+            const response = await axios.post(url, formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                },
+            });
+            if (response.status === 200) {
+                if (response.data && response.data.links && response.data.links.length > 0) {
+                    const fileUrl = response.data.links[0];
+                    const fileUrlArray = JSON.stringify([fileUrl]);
+                    const createdBy = req.user.username;
+                    const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
+                    const values = [reportId, type, fileUrlArray, createdBy];
+                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                        if (insertErr) {
+                            console.error("Error inserting report URL into the database:", insertErr);
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
+                        }
+                        console.log("Report URL inserted successfully into the database");
+                        res.status(200).json({
+                            success: true,
+                            message: 'File uploaded successfully',
+                            fileUrl: fileUrl,
+                        });
+                    });
+                } else {
+                    console.warn("Server returned 200 status but no file URL in response.");
+                    return res.status(500).send("Upload succeeded but no file URL returned");
+                }
+            } else {
+                console.error("Error uploading file:", response.data);
+                return res.status(500).send("Error uploading file");
+            }
+        } catch (error) {
+            console.error("Error processing Incentives:", error);
+            res.status(500).send("Error processing Incentives");
+        } finally {
+            cleanup(uploadDirectory, excelFilePath);
+        }
+    });
+});
 const getReports = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM reports";
     const queryParams = req.query;
@@ -650,5 +729,6 @@ module.exports = {
     getReports,
     getReportsCount,
     deleteReport,
-    exportAttendance
+    exportAttendance,
+    exportIncentives
 };

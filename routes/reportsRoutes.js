@@ -6,6 +6,7 @@ const {
     exportSalarySheet,
     exportLeaves,
     exportHolidays,
+    exportIncentives,
     getReports,
     getReportsCount,
     deleteReport,
@@ -19,6 +20,7 @@ router.route("/interviews").get(validateToken, exportInterviews);
 router.route("/salarysheet").get(validateToken, exportSalarySheet);
 router.route("/leaves").get(validateToken, exportLeaves);
 router.route("/holidays").get(validateToken, exportHolidays);
+router.route("/incentives").get(validateToken, exportIncentives);
 router.route("/attendance").get(validateToken, exportAttendance);
 router.route("/reportsdata").get(validateToken, getReports);
 router.route("/reportsCount").get(validateToken, getReportsCount);

@@ -39,7 +39,6 @@ const getPayroll = asyncHandler(async (req, res) => {
 });
 
 const getPayrollById = asyncHandler((req, res) => {
-    // console.log(req.params)
     const sql = `SELECT * FROM payroll WHERE payslipId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
@@ -84,7 +83,6 @@ const createPayroll = asyncHandler(async (req, res) => {
                     }
                     res.status(200).send(true);
                 });
-
             }
         }
     });
@@ -123,14 +121,12 @@ const updatePayroll = asyncHandler(async (req, res) => {
             }
             return res.status(200).send(updateResult);
         });
-
     });
 });
 
 
 
 const deletePayroll = asyncHandler((req, res) => {
-    // console.log(req.params)
     const sql = `DELETE FROM payroll WHERE payslipId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

@@ -4,7 +4,6 @@ const handleGlobalFilters = require("../middleware/filtersHandler");
 const parseNestedJSON = require("../middleware/parseHandler");
 const {
     createClauseHandler,
-    updateClauseHandler,
 } = require("../middleware/clauseHandler");
 const handleRequiredFields = require("../middleware/requiredFieldsChecker");
 const { generateRandomNumber } = require("../middleware/valueGenerator");
@@ -53,7 +52,6 @@ const getAttendanceById = asyncHandler((req, res) => {
 
 const createAttendance = asyncHandler((req, res) => {
     const date = req.body.attendanceDate;
-    // console.log(date)
     const checkPhoneQuery = `SELECT * FROM attendance WHERE attendanceDate = ?`;
     dbConnect.query(checkPhoneQuery, [date], (err, result) => {
         if (err) {
@@ -90,8 +88,6 @@ const createAttendance = asyncHandler((req, res) => {
 const updateAttendance = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const { attendanceDate, attendanceData } = req.body;
-    // console.log(id)
-    // console.log(attendanceDate)
     const checkRequiredFields = handleRequiredFields("attendance", req.body);
     if (!checkRequiredFields) {
         return res.status(422).send("Please fill all required fields");
@@ -104,7 +100,6 @@ const updateAttendance = asyncHandler(async (req, res) => {
         }
         if (result.length > 0) {
             const attendance = result[0];
-            // console.log(attendance)
             return res
                 .status(409)
                 .send(
@@ -128,7 +123,6 @@ const updateAttendance = asyncHandler(async (req, res) => {
 
 
 const deleteAttendance = asyncHandler((req, res) => {
-    // console.log(req.params)
     const sql = `DELETE FROM attendance WHERE attendanceId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
@@ -139,29 +133,6 @@ const deleteAttendance = asyncHandler((req, res) => {
     });
 });
 
-
-[
-    {
-        employeeid: 5642523,
-        joiningdate: "04/15/2024",
-        workingDays: 27,
-        presentdays: 21,
-        absentdays: 6,
-        casualdays: 2,
-        noofdoublelopdays: 2,
-        latelopdays: 1,
-        totalabsentdays: 10,
-        totaldeductions: 10,
-        salary: 10,
-        daysalary: 866,
-        netsalarywithoutdoublelop: 21666,
-        netsalarywithdoublelop: 21000,
-        petrolexpenses: 0,
-        accountnumber: "874657346794",
-        ifsccode: "SAHFS6567",
-        branchname: "hyderabad"
-    }
-]
 
 module.exports = {
     getAttendanceById,
