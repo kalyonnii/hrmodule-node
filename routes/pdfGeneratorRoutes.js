@@ -1,10 +1,10 @@
-const express = require("express");
-const {
-    generatePdf
-} = require("../controllers/pdfGeneratorController");
-const router = express.Router();
+// const express = require("express");
+// const {
+//     generatePdf
+// } = require("../controllers/pdfGeneratorController");
+// const router = express.Router();
 
-router.route("/payslip").post(generatePdf);
+// router.route("/payslip").post(generatePdf);
 
 
-module.exports = router;
+// module.exports = router;

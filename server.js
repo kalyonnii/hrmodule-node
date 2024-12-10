@@ -6,16 +6,20 @@ app.use(express.json());
 app.use(
     cors({
         origin: "*",
+        // origin: 'http://localhost:58944', // Allow requests only from this port
+        // methods: ['GET', 'POST', 'PUT', 'DELETE', 'UPDATE'], // Specify allowed methods
+        // credentials: true, // Allow cookies if needed
     })
 );
 
 app.use("/user", require("./routes/userRoutes"));
-app.use("/pdfGenerator", require("./routes/pdfGeneratorRoutes"));
+// app.use("/pdfGenerator", require("./routes/pdfGeneratorRoutes"));
 app.use("/employees", require("./routes/employeesRoutes"));
 app.use("/holidays", require("./routes/holidaysRoutes"));
 app.use("/incentives", require("./routes/incentivesRoutes"));
 app.use("/users", require("./routes/usersRoutes"));
 app.use("/interviews", require("./routes/interviewRoutes"));
+app.use("/designations", require("./routes/designationRoutes"));
 app.use("/attendance", require("./routes/attendanceRoutes"));
 app.use("/leaves", require("./routes/leavemanagementRoutes"));
 app.use("/payroll", require("./routes/payrollRoutes"));
