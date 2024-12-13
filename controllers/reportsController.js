@@ -60,6 +60,7 @@ const exportEmployees = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -142,6 +143,7 @@ const exportInterviews = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -225,6 +227,7 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -309,6 +312,7 @@ const exportLeaves = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -391,6 +395,7 @@ const exportHolidays = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -619,6 +624,7 @@ const exportIncentives = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {

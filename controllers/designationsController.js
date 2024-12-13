@@ -28,7 +28,7 @@ const getDesignations = asyncHandler(async (req, res) => {
     const queryParams = req.query;
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    console.log(sql)
+    // console.log(sql)
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getDesignations error:");
@@ -91,6 +91,7 @@ const updateDesignation = asyncHandler((req, res) => {
 
 
 const deleteDesignation = asyncHandler((req, res) => {
+    // console.log(req.params.id)
     const sql = `DELETE FROM designations WHERE designationId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {
