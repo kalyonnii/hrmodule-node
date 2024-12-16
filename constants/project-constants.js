@@ -58,7 +58,6 @@ module.exports = {
             { header: "Updated By", key: "lastUpdatedBy	" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
-
         SALARYSHEET_WORKSHEET_COLUMNS: [
             { header: "Salary Sheet Id", key: "payslipId" },
             { header: "Salary Sheet Month", key: "payrollMonth" },
