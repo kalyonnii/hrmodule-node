@@ -34,7 +34,7 @@ module.exports = {
             { header: "accountNumber", key: "accountNumber" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
 
@@ -55,7 +55,7 @@ module.exports = {
             { header: "Employee Id", key: "referenceNo" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
         SALARYSHEET_WORKSHEET_COLUMNS: [
@@ -92,7 +92,7 @@ module.exports = {
             { header: "Bank Branch", key: "bankBranch" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
         LEAVES_WORKSHEET_COLUMNS: [
@@ -107,7 +107,7 @@ module.exports = {
             { header: "Reason", key: "reason" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
         HOLIDAYS_WORKSHEET_COLUMNS: [
@@ -118,7 +118,7 @@ module.exports = {
             { header: "Description", key: "description" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
         ATTENDANCE_WORKSHEET_COLUMNS: [
@@ -127,7 +127,7 @@ module.exports = {
             { header: "Attendance Data", key: "attendanceData" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ],
         INCENTIVE_WORKSHEET_COLUMNS: [
@@ -140,7 +140,7 @@ module.exports = {
             { header: "Third Month Files", key: "thirdMonthFiles" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
-            { header: "Updated By", key: "lastUpdatedBy	" },
+            { header: "Updated By", key: "lastUpdatedBy" },
             { header: "Updated On", key: "lastUpdatedOn" },
         ]
     },
