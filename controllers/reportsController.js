@@ -9,10 +9,23 @@ const path = require('path');
 const handleGlobalFilters = require("../middleware/filtersHandler");
 const parseNestedJSON = require("../middleware/parseHandler");
 const { generateRandomNumber } = require("../middleware/valueGenerator");
+
 const {
     projectConstantsLocal
 } = require("../constants/project-constants");
 
+async function fetchSalaryHikes() {
+    const sql = `SELECT * FROM salaryHikes`;
+    return new Promise((resolve, reject) => {
+        dbConnect.query(sql, (err, result) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(result);
+        });
+    });
+}
 
 
 const cleanup = (directory, filePath) => {
@@ -41,11 +54,94 @@ const cleanup = (directory, filePath) => {
         });
     }
 };
+// const exportEmployees = asyncHandler(async (req, res) => {
+//     let reportId = "R-" + generateRandomNumber(6);
+//     let sql = "SELECT * FROM employees";
+//     const queryParams = req.query;
+//     queryParams["sort"] = "createdOn";
+//     const filtersQuery = handleGlobalFilters(queryParams);
+//     sql += filtersQuery;
+//     const uploadDirectory = path.join(__dirname, '../excelFiles');
+//     const excelFileName = 'employees1.xlsx';
+//     const excelFilePath = path.join(uploadDirectory, excelFileName);
+//     dbConnect.query(sql, async (err, result) => {
+//         if (err) {
+//             console.error("Error exporting Employees: ", err);
+//             return res.status(500).send("Error in Exporting the Employees");
+//         }
+//         try {
+//             console.log(result)
+//             for (let i = 0; i < result.length; i++) {
+//                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+//                 result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+//             }
+//             result = parseNestedJSON(result);
+//             if (!fs.existsSync(uploadDirectory)) {
+//                 fs.mkdirSync(uploadDirectory, { recursive: true });
+//             }
+//             const workbook = new ExcelJS.Workbook();
+//             const worksheet = workbook.addWorksheet('Employees');
+//             worksheet.columns = projectConstantsLocal.EMPLOYEE_WORKSHEET_COLUMNS;
+//             worksheet.addRows(result);
+//             await workbook.xlsx.writeFile(excelFilePath);
+//             console.log("Excel file created successfully at", excelFilePath);
+//             const fileContent = fs.readFileSync(excelFilePath);
+//             const FormData = require('form-data');
+//             const formData = new FormData();
+//             formData.append('files', fileContent, {
+//                 filename: excelFileName,
+//                 contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+//             });
+//             const type = 'EMPLOYEES';
+//             const employeeId = 'REPORTS';
+//             const url = `https://hrfiles.thefintalk.in/hrfiles?type=${type}&employeeId=${employeeId}`;
+//             const response = await axios.post(url, formData, {
+//                 headers: {
+//                     ...formData.getHeaders(),
+//                 },
+//             });
+//             if (response.status === 200) {
+//                 if (response.data && response.data.links && response.data.links.length > 0) {
+//                     const fileUrl = response.data.links[0];
+//                     const fileUrlArray = JSON.stringify([fileUrl]);
+//                     const createdBy = req.user.username;
+//                     const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
+//                     const values = [reportId, type, fileUrlArray, createdBy];
+//                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+//                         if (insertErr) {
+//                             console.error("Error inserting report URL into the database:", insertErr);
+//                             return res.status(500).send("Error in Inserting the Reports Data with Url");
+//                         }
+//                         console.log("Report URL inserted successfully into the database");
+//                         res.status(200).json({
+//                             success: true,
+//                             message: 'File uploaded successfully',
+//                             fileUrl: fileUrl,
+//                         });
+//                     });
+//                 } else {
+//                     console.warn("Server returned 200 status but no file URL in response.");
+//                     return res.status(500).send("Upload succeeded but no file URL returned");
+//                 }
+//             } else {
+//                 console.error("Error uploading file:", response.data);
+//                 return res.status(500).send("Error uploading file");
+//             }
+//         } catch (error) {
+//             console.error("Error processing Employees:", error);
+//             res.status(500).send("Error processing Employees");
+//         } finally {
+//             cleanup(uploadDirectory, excelFilePath);
+//         }
+//     });
+// });
+
+
 const exportEmployees = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM employees";
     const queryParams = req.query;
-    queryParams["sort"] = "createdOn";
+    queryParams["sort"] = "joiningDate,asc";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
     const uploadDirectory = path.join(__dirname, '../excelFiles');
@@ -57,11 +153,22 @@ const exportEmployees = asyncHandler(async (req, res) => {
             return res.status(500).send("Error in Exporting the Employees");
         }
         try {
-            console.log(result)
-            for (let i = 0; i < result.length; i++) {
-                result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
-            }
+            const salaryHikeData = await fetchSalaryHikes();
+            result.forEach((row) => {
+                const { employeeId, salary, ...employeeData } = row;
+                let currentSalary = Number(salary);
+                const matchingHikes = salaryHikeData.filter((hike) => hike.employeeId === employeeId);
+                let totalHike = 0;
+                console.log(matchingHikes)
+                matchingHikes.forEach((hike) => {
+                    totalHike += Number(hike.monthlyHike);
+                });
+                row.salary = currentSalary + totalHike;
+            });
+            result.forEach((employee) => {
+                employee.createdOn = moment(employee.createdOn).format('YYYY-MM-DD');
+                employee.lastUpdatedOn = moment(employee.lastUpdatedOn).format('YYYY-MM-DD hh:mm:ss A');
+            });
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
                 fs.mkdirSync(uploadDirectory, { recursive: true });
@@ -69,7 +176,9 @@ const exportEmployees = asyncHandler(async (req, res) => {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Employees');
             worksheet.columns = projectConstantsLocal.EMPLOYEE_WORKSHEET_COLUMNS;
-            worksheet.addRows(result);
+            result.forEach((employee) => {
+                worksheet.addRow(employee);
+            });
             await workbook.xlsx.writeFile(excelFilePath);
             console.log("Excel file created successfully at", excelFilePath);
             const fileContent = fs.readFileSync(excelFilePath);
@@ -92,7 +201,7 @@ const exportEmployees = asyncHandler(async (req, res) => {
                     const fileUrl = response.data.links[0];
                     const fileUrlArray = JSON.stringify([fileUrl]);
                     const createdBy = req.user.username;
-                    const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
+                    const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?, ?)";
                     const values = [reportId, type, fileUrlArray, createdBy];
                     dbConnect.query(insertSql, values, (insertErr, insertResult) => {
                         if (insertErr) {
@@ -123,12 +232,11 @@ const exportEmployees = asyncHandler(async (req, res) => {
     });
 });
 
-
 const exportInterviews = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM interviews";
     const queryParams = req.query;
-    queryParams["sort"] = "createdOn";
+    queryParams["sort"] = "scheduledDate";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
     const uploadDirectory = path.join(__dirname, '../excelFiles');
@@ -143,7 +251,7 @@ const exportInterviews = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD hh:mm:ss A');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -212,7 +320,7 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM payroll";
     const queryParams = req.query;
-    queryParams["sort"] = "createdOn";
+    queryParams["sort"] = "joiningDate,asc";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
     const uploadDirectory = path.join(__dirname, '../excelFiles');
@@ -227,7 +335,7 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD hh:mm:ss A');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -312,7 +420,7 @@ const exportLeaves = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD hh:mm:ss A');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -380,7 +488,7 @@ const exportHolidays = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM holidays";
     const queryParams = req.query;
-    queryParams["sort"] = "createdOn";
+    queryParams["sort"] = "date,asc";
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
     const uploadDirectory = path.join(__dirname, '../excelFiles');
@@ -395,7 +503,7 @@ const exportHolidays = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD hh:mm:ss A');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -624,7 +732,7 @@ const exportIncentives = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD hh:mm:ss A');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {

@@ -146,7 +146,7 @@ const updateEmployee = asyncHandler((req, res) => {
             return res
                 .status(409)
                 .send(
-                    `Employee already exists with phone number ${primaryPhone}, created by - ${employee.createdBy}, Employee ID - ${employee.employeeId}, Employee Name - ${employee.employeeName}`
+                    `Employee already exists with Phone Number ${primaryPhone}, Created By - ${employee.createdBy}, Employee ID - ${employee.employeeId}, Employee Name - ${employee.employeeName}`
                 );
         }
         req.body["lastUpdatedBy"] = req.user.username;

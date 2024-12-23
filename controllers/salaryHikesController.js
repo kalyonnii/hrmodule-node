@@ -67,6 +67,41 @@ const createSalaryHike = asyncHandler((req, res) => {
     });
 });
 
+
+// const createSalaryHike = asyncHandler((req, res) => {
+//     let hikeId = "S-" + generateRandomNumber(6);
+//     req.body["hikeId"] = hikeId;
+//     req.body["createdBy"] = req.user.username;
+//     req.body["lastUpdatedBy"] = req.user.username;
+
+//     const employeeId = req.body.employeeId;
+//     const newMonthlyHike = parseFloat(req.body.monthlyHike);
+//     const checkEmployeeQuery = `SELECT monthlyHike FROM salaryhikes WHERE employeeId = ?`;
+//     dbConnect.query(checkEmployeeQuery, [employeeId], (err, result) => {
+//         if (err) {
+//             console.log("Error checking employeeId:", err);
+//             return res.status(500).send("Error in checking Employee ID");
+//         }
+//         if (result.length > 0) {
+//             const currentMonthlyHike = parseFloat(result[0].monthlyHike);
+//             const updatedMonthlyHike = currentMonthlyHike + newMonthlyHike;
+//             req.body["monthlyHike"] = updatedMonthlyHike;
+//         }
+//         const createClause = createClauseHandler(req.body);
+//         const insertQuery = `
+//             INSERT INTO salaryhikes (${createClause[0]}) 
+//             VALUES (${createClause[1]})
+//         `;
+//         dbConnect.query(insertQuery, (insertErr) => {
+//             if (insertErr) {
+//                 console.log("Error inserting new salary hike:", insertErr);
+//                 return res.status(500).send("Error creating Salary Hike");
+//             }
+//             return res.status(200).send(true);
+//         });
+//     });
+// });
+
 const updateSalaryHike = asyncHandler((req, res) => {
     const id = req.params.id;
     const checkRequiredFields = handleRequiredFields("salaryhikes", req.body);

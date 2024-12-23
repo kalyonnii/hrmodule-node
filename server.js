@@ -34,10 +34,10 @@ app.use("/payroll", require("./routes/payrollRoutes"));
 app.use("/reports", require("./routes/reportsRoutes"));
 app.use("/mail", require("./routes/nodeMailRoutes"));
 
-// app.listen(process.env.PORT, () => {
-//     console.log(`Server running at http://localhost:${process.env.PORT}`);
-// });
-
-https.createServer(options, app).listen(process.env.PORT, () => {
-    console.log(`HTTPS Server running on port ${process.env.PORT}`);
+app.listen(process.env.PORT, () => {
+    console.log(`Server running at http://localhost:${process.env.PORT}`);
 });
+
+// https.createServer(options, app).listen(process.env.PORT, () => {
+//     console.log(`HTTPS Server running on port ${process.env.PORT}`);
+// });
