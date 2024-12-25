@@ -15,7 +15,7 @@ const {
 } = require("../constants/project-constants");
 
 async function fetchSalaryHikes() {
-    const sql = `SELECT * FROM salaryHikes`;
+    const sql = `SELECT * FROM salaryhikes`;
     return new Promise((resolve, reject) => {
         dbConnect.query(sql, (err, result) => {
             if (err) {
