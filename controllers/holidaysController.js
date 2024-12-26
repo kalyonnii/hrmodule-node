@@ -50,7 +50,6 @@ const getHolidayById = asyncHandler((req, res) => {
     });
 });
 
-
 const createHoliday = asyncHandler((req, res) => {
     let holidayId = "H-" + generateRandomNumber(6);
     req.body["holidayId"] = holidayId;
@@ -85,8 +84,6 @@ const updateHoliday = asyncHandler((req, res) => {
     });
 });
 
-
-
 const deleteHoliday = asyncHandler((req, res) => {
     const sql = `DELETE FROM holidays WHERE holidayId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
@@ -97,7 +94,6 @@ const deleteHoliday = asyncHandler((req, res) => {
         res.status(200).json({ message: "Holiday Deleted Successfully" });
     });
 });
-
 
 module.exports = {
     getHolidayById,

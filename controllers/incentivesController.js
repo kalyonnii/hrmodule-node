@@ -50,7 +50,6 @@ const getIncentiveById = asyncHandler((req, res) => {
     });
 });
 
-
 const createIncentive = asyncHandler((req, res) => {
     let incentiveId = "C-" + generateRandomNumber(6);
     req.body["incentiveId"] = incentiveId;
@@ -85,8 +84,6 @@ const updateIncentive = asyncHandler((req, res) => {
     });
 });
 
-
-
 const deleteIncentive = asyncHandler((req, res) => {
     const sql = `DELETE FROM incentives WHERE incentiveId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
@@ -97,7 +94,6 @@ const deleteIncentive = asyncHandler((req, res) => {
         res.status(200).json({ message: "Incentive Deleted Successfully" });
     });
 });
-
 
 module.exports = {
     getIncentiveById,

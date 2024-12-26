@@ -50,7 +50,6 @@ const getLeaveById = asyncHandler((req, res) => {
     });
 });
 
-
 const createLeave = asyncHandler((req, res) => {
     let leaveId = "L-" + generateRandomNumber(6);
     req.body["leaveId"] = leaveId;
@@ -86,8 +85,6 @@ const updateLeave = asyncHandler((req, res) => {
         return res.status(200).send(updateResult);
     });
 });
-
-
 
 const deleteLeave = asyncHandler((req, res) => {
     const sql = `DELETE FROM leavemanagement WHERE leaveId = '${req.params.id}'`;

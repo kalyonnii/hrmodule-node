@@ -49,7 +49,6 @@ const getAttendanceById = asyncHandler((req, res) => {
     });
 });
 
-
 const createAttendance = asyncHandler((req, res) => {
     const date = req.body.attendanceDate;
     const checkPhoneQuery = `SELECT * FROM attendance WHERE attendanceDate = ?`;
@@ -121,7 +120,6 @@ const updateAttendance = asyncHandler(async (req, res) => {
     });
 });
 
-
 const deleteAttendance = asyncHandler((req, res) => {
     const sql = `DELETE FROM attendance WHERE attendanceId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
@@ -132,7 +130,6 @@ const deleteAttendance = asyncHandler((req, res) => {
         res.status(200).json({ message: "Attendance Deleted Successfully" });
     });
 });
-
 
 module.exports = {
     getAttendanceById,

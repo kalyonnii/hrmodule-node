@@ -50,9 +50,7 @@ const getPayrollById = asyncHandler((req, res) => {
     });
 });
 
-
 const createPayroll = asyncHandler(async (req, res) => {
-
     const payrollMonth = req.body.payrollMonth;
     const employeeId = req.body.employeeId;
     const checkPhoneQuery = `SELECT * FROM payroll WHERE payrollMonth = ? AND employeeId = ?`;
@@ -124,8 +122,6 @@ const updatePayroll = asyncHandler(async (req, res) => {
     });
 });
 
-
-
 const deletePayroll = asyncHandler((req, res) => {
     const sql = `DELETE FROM payroll WHERE payslipId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
@@ -136,7 +132,6 @@ const deletePayroll = asyncHandler((req, res) => {
         res.status(200).json({ message: "Payroll Deleted Successfully" });
     });
 });
-
 
 module.exports = {
     getPayroll,

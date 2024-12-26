@@ -28,7 +28,6 @@ const getDesignations = asyncHandler(async (req, res) => {
     const queryParams = req.query;
     const filtersQuery = handleGlobalFilters(queryParams);
     sql += filtersQuery;
-    // console.log(sql)
     dbConnect.query(sql, (err, result) => {
         if (err) {
             console.log("getDesignations error:");
@@ -50,7 +49,6 @@ const getDesignationsById = asyncHandler((req, res) => {
         res.status(200).send(result[0]);
     });
 });
-
 
 const createDesignation = asyncHandler((req, res) => {
     let designationId = "D-" + generateRandomNumber(6);
@@ -88,10 +86,7 @@ const updateDesignation = asyncHandler((req, res) => {
     });
 });
 
-
-
 const deleteDesignation = asyncHandler((req, res) => {
-    // console.log(req.params.id)
     const sql = `DELETE FROM designations WHERE designationId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

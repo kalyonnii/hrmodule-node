@@ -27,7 +27,6 @@ async function fetchSalaryHikes() {
     });
 }
 
-
 const cleanup = (directory, filePath) => {
     if (fs.existsSync(filePath)) {
         fs.unlink(filePath, (unlinkErr) => {
@@ -135,8 +134,6 @@ const cleanup = (directory, filePath) => {
 //         }
 //     });
 // });
-
-
 const exportEmployees = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM employees";
@@ -314,8 +311,6 @@ const exportInterviews = asyncHandler(async (req, res) => {
     });
 });
 
-
-
 const exportSalarySheet = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM payroll";
@@ -399,8 +394,6 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
     });
 });
 
-
-
 const exportLeaves = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM leavemanagement";
@@ -483,7 +476,6 @@ const exportLeaves = asyncHandler(async (req, res) => {
     });
 });
 
-
 const exportHolidays = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
     let sql = "SELECT * FROM holidays";
@@ -565,9 +557,6 @@ const exportHolidays = asyncHandler(async (req, res) => {
         }
     });
 });
-
-
-
 
 const exportAttendance = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);
@@ -711,7 +700,6 @@ const exportAttendance = asyncHandler(async (req, res) => {
         });
     });
 });
-
 
 const exportIncentives = asyncHandler(async (req, res) => {
     let reportId = "R-" + generateRandomNumber(6);

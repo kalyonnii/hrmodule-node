@@ -51,7 +51,6 @@ const getUserById = asyncHandler((req, res) => {
     });
 });
 
-
 const createUser = asyncHandler(async (req, res) => {
     let userId = "U-" + generateRandomNumber(6);
     let password = req.body.password;
@@ -114,8 +113,6 @@ const updateUser = asyncHandler(async (req, res) => {
     });
 });
 
-
-
 const deleteUser = asyncHandler((req, res) => {
     const sql = `DELETE FROM users WHERE userId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
@@ -126,7 +123,6 @@ const deleteUser = asyncHandler((req, res) => {
         res.status(200).json({ message: "User Deleted Successfully" });
     });
 });
-
 
 module.exports = {
     getUsers,

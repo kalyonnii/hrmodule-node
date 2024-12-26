@@ -50,7 +50,6 @@ const getSalaryHikesById = asyncHandler((req, res) => {
     });
 });
 
-
 const createSalaryHike = asyncHandler((req, res) => {
     let hikeId = "S-" + generateRandomNumber(6);
     req.body["hikeId"] = hikeId;
@@ -66,7 +65,6 @@ const createSalaryHike = asyncHandler((req, res) => {
         res.status(200).send(true);
     });
 });
-
 
 // const createSalaryHike = asyncHandler((req, res) => {
 //     let hikeId = "S-" + generateRandomNumber(6);
@@ -119,8 +117,6 @@ const updateSalaryHike = asyncHandler((req, res) => {
         return res.status(200).send(updateResult);
     });
 });
-
-
 
 const deleteSalaryHike = asyncHandler((req, res) => {
     const sql = `DELETE FROM salaryhikes WHERE hikeId = '${req.params.id}'`;

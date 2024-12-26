@@ -23,8 +23,6 @@ const getEmployeesCount = asyncHandler(async (req, res) => {
     });
 });
 
-
-
 const createEmployeeFromInterview = asyncHandler((req, res) => {
     const phoneNumber = req.body.primaryPhone;
     const checkPhoneQuery = `SELECT * FROM employees WHERE primaryPhone = ?`;
@@ -62,7 +60,6 @@ const createEmployeeFromInterview = asyncHandler((req, res) => {
     });
 });
 
-
 const getEmployees = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM employees";
     const queryParams = req.query;
@@ -89,7 +86,6 @@ const getEmployeeById = asyncHandler((req, res) => {
         res.status(200).send(result[0]);
     });
 });
-
 
 const createEmployee = asyncHandler((req, res) => {
     const phoneNumber = req.body.primaryPhone;
@@ -161,7 +157,6 @@ const updateEmployee = asyncHandler((req, res) => {
         });
     });
 });
-
 
 const deleteEmployee = asyncHandler((req, res) => {
     const sql = `DELETE FROM employees WHERE employeeId = ${req.params.id}`;

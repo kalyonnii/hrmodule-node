@@ -50,7 +50,6 @@ const getInterviewById = asyncHandler((req, res) => {
     });
 });
 
-
 const createInterview = asyncHandler((req, res) => {
     const phoneNumber = req.body.primaryPhone;
     const checkPhoneQuery = `SELECT * FROM interviews WHERE primaryPhone = ?`;
@@ -121,7 +120,6 @@ const updateInterview = asyncHandler((req, res) => {
         });
     });
 });
-
 
 const deleteInterview = asyncHandler((req, res) => {
     const sql = `DELETE FROM interviews WHERE interviewId = '${req.params.id}'`;

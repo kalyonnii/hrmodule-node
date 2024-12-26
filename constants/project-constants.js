@@ -32,12 +32,17 @@ module.exports = {
             { header: "Bank Branch", key: "bankBranch" },
             { header: "IFSC Code", key: "ifscCode" },
             { header: "Account Number", key: "accountNumber" },
+            { header: "Resignation Date", key: "resignedDate" },
+            { header: "Resignation Reason", key: "resignedReason" },
+            { header: "Termination Date", key: "terminationDate" },
+            { header: "Termination Reason", key: "terminationReason" },
+            { header: "Issued Payslips?", key: "issuedPayslips" },
+            { header: "Any Dues?", key: "anyDues" },
             { header: "Created By", key: "createdBy" },
             { header: "Created On", key: "createdOn" },
             { header: "Last Updated By", key: "lastUpdatedBy" },
             { header: "Last Updated On", key: "lastUpdatedOn" },
         ],
-
         INTERVIEW_WORKSHEET_COLUMNS: [
             { header: "Interview Id", key: "interviewId" },
             { header: "Candidate Name", key: "candidateName" },
