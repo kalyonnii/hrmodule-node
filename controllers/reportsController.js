@@ -164,7 +164,7 @@ const exportEmployees = asyncHandler(async (req, res) => {
             });
             result.forEach((employee) => {
                 employee.createdOn = moment(employee.createdOn).format('YYYY-MM-DD');
-                employee.lastUpdatedOn = moment(employee.lastUpdatedOn).format('YYYY-MM-DD h:mm A');
+                employee.lastUpdatedOn = moment(employee.lastUpdatedOn).format('YYYY-MM-DD');
             });
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -248,7 +248,7 @@ const exportInterviews = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD h:mm A');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -330,7 +330,7 @@ const exportSalarySheet = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD h:mm A');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -413,7 +413,7 @@ const exportLeaves = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD h:mm A');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -495,7 +495,7 @@ const exportHolidays = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD h:mm A');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -720,7 +720,7 @@ const exportIncentives = asyncHandler(async (req, res) => {
             console.log(result)
             for (let i = 0; i < result.length; i++) {
                 result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
-                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD h:mm A');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
             }
             result = parseNestedJSON(result);
             if (!fs.existsSync(uploadDirectory)) {
@@ -782,6 +782,251 @@ const exportIncentives = asyncHandler(async (req, res) => {
         }
     });
 });
+const exportDesignations = asyncHandler(async (req, res) => {
+    let reportId = "R-" + generateRandomNumber(6);
+    let sql = "SELECT * FROM designations";
+    const queryParams = req.query;
+    queryParams["sort"] = "createdOn";
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+    const uploadDirectory = path.join(__dirname, '../excelFiles');
+    const excelFileName = 'departments1.xlsx';
+    const excelFilePath = path.join(uploadDirectory, excelFileName);
+    dbConnect.query(sql, async (err, result) => {
+        if (err) {
+            console.error("Error exporting Departments: ", err);
+            return res.status(500).send("Error in Exporting the Departments");
+        }
+        try {
+            console.log(result)
+            for (let i = 0; i < result.length; i++) {
+                result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+            }
+            result = parseNestedJSON(result);
+            if (!fs.existsSync(uploadDirectory)) {
+                fs.mkdirSync(uploadDirectory, { recursive: true });
+            }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Departments');
+            worksheet.columns = projectConstantsLocal.DESIGNATIONS_WORKSHEET_COLUMNS;
+            worksheet.addRows(result);
+            await workbook.xlsx.writeFile(excelFilePath);
+            console.log("Excel file created successfully at", excelFilePath);
+            const fileContent = fs.readFileSync(excelFilePath);
+            const FormData = require('form-data');
+            const formData = new FormData();
+            formData.append('files', fileContent, {
+                filename: excelFileName,
+                contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+            const type = 'DEPARTMENTS';
+            const employeeId = 'REPORTS';
+            const url = `https://hrfiles.thefintalk.in/hrfiles?type=${type}&employeeId=${employeeId}`;
+            const response = await axios.post(url, formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                },
+            });
+            if (response.status === 200) {
+                if (response.data && response.data.links && response.data.links.length > 0) {
+                    const fileUrl = response.data.links[0];
+                    const fileUrlArray = JSON.stringify([fileUrl]);
+                    const createdBy = req.user.username;
+                    const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
+                    const values = [reportId, type, fileUrlArray, createdBy];
+                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                        if (insertErr) {
+                            console.error("Error inserting report URL into the database:", insertErr);
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
+                        }
+                        console.log("Report URL inserted successfully into the database");
+                        res.status(200).json({
+                            success: true,
+                            message: 'File uploaded successfully',
+                            fileUrl: fileUrl,
+                        });
+                    });
+                } else {
+                    console.warn("Server returned 200 status but no file URL in response.");
+                    return res.status(500).send("Upload succeeded but no file URL returned");
+                }
+            } else {
+                console.error("Error uploading file:", response.data);
+                return res.status(500).send("Error uploading file");
+            }
+        } catch (error) {
+            console.error("Error processing Departments:", error);
+            res.status(500).send("Error processing Departments");
+        } finally {
+            cleanup(uploadDirectory, excelFilePath);
+        }
+    });
+});
+const exportSalaryHikes = asyncHandler(async (req, res) => {
+    let reportId = "R-" + generateRandomNumber(6);
+    let sql = "SELECT * FROM salaryhikes";
+    const queryParams = req.query;
+    queryParams["sort"] = "createdOn";
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+    const uploadDirectory = path.join(__dirname, '../excelFiles');
+    const excelFileName = 'salaryhikes1.xlsx';
+    const excelFilePath = path.join(uploadDirectory, excelFileName);
+    dbConnect.query(sql, async (err, result) => {
+        if (err) {
+            console.error("Error exporting Salary Hikes: ", err);
+            return res.status(500).send("Error in Exporting the Saalry Hikes");
+        }
+        try {
+            console.log(result)
+            for (let i = 0; i < result.length; i++) {
+                result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+            }
+            result = parseNestedJSON(result);
+            if (!fs.existsSync(uploadDirectory)) {
+                fs.mkdirSync(uploadDirectory, { recursive: true });
+            }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Salaryhikes');
+            worksheet.columns = projectConstantsLocal.SALARY_HIKES_WORKSHEET_COLUMNS;
+            worksheet.addRows(result);
+            await workbook.xlsx.writeFile(excelFilePath);
+            console.log("Excel file created successfully at", excelFilePath);
+            const fileContent = fs.readFileSync(excelFilePath);
+            const FormData = require('form-data');
+            const formData = new FormData();
+            formData.append('files', fileContent, {
+                filename: excelFileName,
+                contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+            const type = 'SALARY_HIKES';
+            const employeeId = 'REPORTS';
+            const url = `https://hrfiles.thefintalk.in/hrfiles?type=${type}&employeeId=${employeeId}`;
+            const response = await axios.post(url, formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                },
+            });
+            if (response.status === 200) {
+                if (response.data && response.data.links && response.data.links.length > 0) {
+                    const fileUrl = response.data.links[0];
+                    const fileUrlArray = JSON.stringify([fileUrl]);
+                    const createdBy = req.user.username;
+                    const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
+                    const values = [reportId, type, fileUrlArray, createdBy];
+                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                        if (insertErr) {
+                            console.error("Error inserting report URL into the database:", insertErr);
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
+                        }
+                        console.log("Report URL inserted successfully into the database");
+                        res.status(200).json({
+                            success: true,
+                            message: 'File uploaded successfully',
+                            fileUrl: fileUrl,
+                        });
+                    });
+                } else {
+                    console.warn("Server returned 200 status but no file URL in response.");
+                    return res.status(500).send("Upload succeeded but no file URL returned");
+                }
+            } else {
+                console.error("Error uploading file:", response.data);
+                return res.status(500).send("Error uploading file");
+            }
+        } catch (error) {
+            console.error("Error processing Salary Hikes:", error);
+            res.status(500).send("Error processing Salary Hikes");
+        } finally {
+            cleanup(uploadDirectory, excelFilePath);
+        }
+    });
+});
+
+
+const exportUsers = asyncHandler(async (req, res) => {
+    let reportId = "R-" + generateRandomNumber(6);
+    let sql = "SELECT * FROM users";
+    const queryParams = req.query;
+    queryParams["sort"] = "createdOn";
+    const filtersQuery = handleGlobalFilters(queryParams);
+    sql += filtersQuery;
+    const uploadDirectory = path.join(__dirname, '../excelFiles');
+    const excelFileName = 'users1.xlsx';
+    const excelFilePath = path.join(uploadDirectory, excelFileName);
+    dbConnect.query(sql, async (err, result) => {
+        if (err) {
+            console.error("Error exporting Users: ", err);
+            return res.status(500).send("Error in Exporting the Users");
+        }
+        try {
+            console.log(result)
+            for (let i = 0; i < result.length; i++) {
+                result[i].createdOn = moment(result[i].createdOn).format('YYYY-MM-DD');
+                result[i].lastUpdatedOn = moment(result[i].lastUpdatedOn).format('YYYY-MM-DD');
+            }
+            result = parseNestedJSON(result);
+            if (!fs.existsSync(uploadDirectory)) {
+                fs.mkdirSync(uploadDirectory, { recursive: true });
+            }
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Users');
+            worksheet.columns = projectConstantsLocal.USERS_WORKSHEET_COLUMNS;
+            worksheet.addRows(result);
+            await workbook.xlsx.writeFile(excelFilePath);
+            console.log("Excel file created successfully at", excelFilePath);
+            const fileContent = fs.readFileSync(excelFilePath);
+            const FormData = require('form-data');
+            const formData = new FormData();
+            formData.append('files', fileContent, {
+                filename: excelFileName,
+                contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+            const type = 'USERS';
+            const employeeId = 'REPORTS';
+            const url = `https://hrfiles.thefintalk.in/hrfiles?type=${type}&employeeId=${employeeId}`;
+            const response = await axios.post(url, formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                },
+            });
+            if (response.status === 200) {
+                if (response.data && response.data.links && response.data.links.length > 0) {
+                    const fileUrl = response.data.links[0];
+                    const fileUrlArray = JSON.stringify([fileUrl]);
+                    const createdBy = req.user.username;
+                    const insertSql = "INSERT INTO reports (reportId, reportType, reportUrl, createdBy) VALUES (?, ?, ?,?)";
+                    const values = [reportId, type, fileUrlArray, createdBy];
+                    dbConnect.query(insertSql, values, (insertErr, insertResult) => {
+                        if (insertErr) {
+                            console.error("Error inserting report URL into the database:", insertErr);
+                            return res.status(500).send("Error in Inserting the Reports Data with Url");
+                        }
+                        console.log("Report URL inserted successfully into the database");
+                        res.status(200).json({
+                            success: true,
+                            message: 'File uploaded successfully',
+                            fileUrl: fileUrl,
+                        });
+                    });
+                } else {
+                    console.warn("Server returned 200 status but no file URL in response.");
+                    return res.status(500).send("Upload succeeded but no file URL returned");
+                }
+            } else {
+                console.error("Error uploading file:", response.data);
+                return res.status(500).send("Error uploading file");
+            }
+        } catch (error) {
+            console.error("Error processing Users:", error);
+            res.status(500).send("Error processing Users");
+        } finally {
+            cleanup(uploadDirectory, excelFilePath);
+        }
+    });
+});
 const getReports = asyncHandler(async (req, res) => {
     let sql = "SELECT * FROM reports";
     const queryParams = req.query;
@@ -832,5 +1077,8 @@ module.exports = {
     getReportsCount,
     deleteReport,
     exportAttendance,
-    exportIncentives
+    exportIncentives,
+    exportSalaryHikes,
+    exportDesignations,
+    exportUsers
 };
