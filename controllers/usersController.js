@@ -51,6 +51,37 @@ const getUserById = asyncHandler((req, res) => {
     });
 });
 
+// const createUser = asyncHandler(async (req, res) => {
+//     let userId = "U-" + generateRandomNumber(6);
+//     let password = req.body.password;
+//     let encryptedPassword = await bcrypt.hash(password, 12);
+//     req.body["encryptedPassword"] = encryptedPassword;
+//     req.body["userId"] = userId;
+//     req.body["createdBy"] = req.user.username;
+//     req.body["lastUpdatedBy"] = req.user.username;
+//     const checkIfExistsQuery = `SELECT * FROM users WHERE username = ?`;
+//     dbConnect.query(checkIfExistsQuery, [req.body.username], (err, results) => {
+//         if (err) {
+//             console.error("Error checking if user exists:", err);
+//             return res.status(500).send("Error in Checking Username");
+//         }
+//         if (results.length > 0) {
+//             res.status(400).send("Username already exists");
+//             return;
+//         }
+//         const createClause = createClauseHandler(req.body);
+//         const sql = `INSERT INTO users (${createClause[0]}) VALUES (${createClause[1]})`;
+//         dbConnect.query(sql, (err, result) => {
+//             if (err) {
+//                 console.log("createUser error:");
+//                 return res.status(500).send("Error in Creating the User");
+//             }
+//             res.status(200).send(true);
+//         });
+//     });
+// });
+
+
 const createUser = asyncHandler(async (req, res) => {
     let userId = "U-" + generateRandomNumber(6);
     let password = req.body.password;
@@ -76,11 +107,29 @@ const createUser = asyncHandler(async (req, res) => {
                 console.log("createUser error:");
                 return res.status(500).send("Error in Creating the User");
             }
-            res.status(200).send(true);
+            const rbacValues = {
+                1: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,users,adminSalaryHikes,events,reports,ipAddress',
+                2: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,adminSalaryHikes,events,reports',
+                3: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,adminSalaryHikes,events,reports',
+                4: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,users,adminSalaryHikes,events,reports,passwordView,delete,ipAddress',
+            };
+            const rbacValue = rbacValues[req.body.designation];
+            if (rbacValue) {
+                console.log(userId)
+                const updateRbacQuery = `UPDATE users SET rbac = ? WHERE userId = ?`;
+                dbConnect.query(updateRbacQuery, [rbacValue, userId], (err, updateResult) => {
+                    if (err) {
+                        console.error("Error updating RBAC:", err);
+                        return res.status(500).send("Error in Updating RBAC");
+                    }
+                    res.status(200).send(true);
+                });
+            } else {
+                res.status(200).send(true);
+            }
         });
     });
 });
-
 const updateUser = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const checkRequiredFields = handleRequiredFields("users", req.body);
@@ -108,7 +157,26 @@ const updateUser = asyncHandler(async (req, res) => {
                 console.error("updateUser error:", updateErr);
                 return res.status(500).send("Error in Updating User");
             }
-            return res.status(200).send(updateResult);
+            const rbacValues = {
+                1: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,users,adminSalaryHikes,events,reports,ipAddress',
+                2: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,adminSalaryHikes,events,reports',
+                3: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,adminSalaryHikes,events,reports',
+                4: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,users,adminSalaryHikes,events,reports,passwordView,delete,ipAddress',
+            };
+            const rbacValue = rbacValues[req.body.designation];
+            if (rbacValue) {
+                const updateRbacQuery = `UPDATE users SET rbac = ? WHERE userId = ?`;
+                dbConnect.query(updateRbacQuery, [rbacValue, id], (err, updateResult) => {
+                    if (err) {
+                        console.error("Error updating RBAC:", err);
+                        return res.status(500).send("Error in Updating RBAC");
+                    }
+                    console.log(updateResult)
+                    res.status(200).send(updateResult);
+                });
+            } else {
+                return res.status(200).send(updateResult);
+            }
         });
     });
 });

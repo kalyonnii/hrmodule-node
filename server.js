@@ -3,6 +3,7 @@ const cors = require("cors");
 const app = express();
 const https = require('https');
 const fs = require('fs');
+const ipWhitelist = require('./middleware/ipAddress.js');
 app.use(express.json());
 
 app.use(
@@ -33,6 +34,7 @@ app.use("/leaves", require("./routes/leavemanagementRoutes"));
 app.use("/payroll", require("./routes/payrollRoutes"));
 app.use("/reports", require("./routes/reportsRoutes"));
 app.use("/mail", require("./routes/nodeMailRoutes"));
+app.use("/ipAddress", require("./routes/ipAddressRoutes.js"));
 
 // app.listen(process.env.PORT, () => {
 //     console.log(`Server running at http://localhost:${process.env.PORT}`);
