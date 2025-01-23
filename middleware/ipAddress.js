@@ -22,29 +22,24 @@ function fetchAllowedIPs() {
     });
 }
 
-async function fetchClientIP() {
-    try {
-        const response = await axios.get("https://api.ipify.org?format=json");
-        currentClientIP = response.data.ip;
-        console.log("Fetched Client IP:", currentClientIP);
-    } catch (error) {
-        console.error("Error fetching client IP:", error);
-    }
-}
+// async function fetchClientIP() {
+//     try {
+//         const response = await axios.get("https://api.ipify.org?format=json");
+//         currentClientIP = response.data.ip;
+//         console.log("Fetched Client IP:", currentClientIP);
+//     } catch (error) {
+//         console.error("Error fetching client IP:", error);
+//     }
+// }
 
 
 
 async function ipWhitelist(req, res, next) {
     try {
         allowedIPs = await fetchAllowedIPs();
-        // console.log("Updated allowed IP prefixes:", allowedIPs);
-        await fetchClientIP();
-        const clientIPPrefix = currentClientIP.split(".").slice(0, 2).join(".");
-        // console.log("Client IP Prefix:", clientIPPrefix);
+        // console.log(req.headers["mysystem-ip"])
+        const clientIPPrefix = req.headers["mysystem-ip"].split(".").slice(0, 2).join(".");
         const isAllowed = allowedIPs.includes(clientIPPrefix);
-        // console.log("Allowed IP Prefixes:", allowedIPs);
-        // console.log("Is Allowed:", isAllowed);
-        // console.log(req.body)
         if (isAllowed) {
             next();
         } else {
