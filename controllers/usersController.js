@@ -108,10 +108,10 @@ const createUser = asyncHandler(async (req, res) => {
                 return res.status(500).send("Error in Creating the User");
             }
             const rbacValues = {
-                1: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,users,adminSalaryHikes,events,reports,ipAddress',
-                2: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,adminSalaryHikes,events,reports',
-                3: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,adminSalaryHikes,events,reports',
-                4: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,Departments,users,adminSalaryHikes,events,reports,passwordView,delete,ipAddress',
+                1: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,users,adminSalaryHikes,events,reports,ipAddress',
+                2: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,adminSalaryHikes,events,reports',
+                3: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,adminSalaryHikes,events,reports',
+                4: 'adminEmployees,interviews,adminAttendance,adminPayroll,adminLeaves,holidays,adminIncentives,departments,users,adminSalaryHikes,events,reports,passwordView,delete,ipAddress',
             };
             const rbacValue = rbacValues[req.body.designation];
             if (rbacValue) {
