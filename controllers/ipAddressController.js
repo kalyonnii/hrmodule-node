@@ -70,6 +70,7 @@ const getIpAddressById = asyncHandler((req, res) => {
 
 const updateIpAddress = asyncHandler((req, res) => {
     const id = req.params.id;
+    req.body["lastUpdatedBy"] = req.user.username;
     const updateClause = updateClauseHandler(req.body);
     const sql = `UPDATE ipaddresses SET ${updateClause} WHERE ipAddressId = '${id}'`;
     dbConnect.query(sql, (err, result) => {
