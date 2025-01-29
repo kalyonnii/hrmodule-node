@@ -53,19 +53,20 @@ async function ipWhitelist(req, res, next) {
         res.status(500).send("Internal server error");
     }
 }
-// const applyIpWhitelist = async (req, res, next) => {
-//     try {
-//         console.log("req", req.user);
-//         if (req.user && req.user.rbac && req.user.rbac.includes('employee')) {
-//             // If the user is an employee, do not apply ipWhitelist
-//             return next();
-//         }
-//         // If not an employee, apply ipWhitelist
-//         await ipWhitelist(req, res, next);
-//     } catch (error) {
-//         console.error("Error in applyIpWhitelist:", error);
-//         res.status(500).send("Internal server error");
-//     }
-// };
+const applyIpWhitelist = async (req, res, next) => {
+    try {
+        const userType = req.headers["user-type"] ? req.headers["user-type"].trim().toLowerCase() : "";
+        console.log("UserType Trimmed:", userType);
+        if (JSON.parse(userType) === "employee") {
+            console.log("true");
+            return next();
+        }
+        console.log("Not an Employee");
+        await ipWhitelist(req, res, next);
+    } catch (error) {
+        console.error("Error in applyIpWhitelist:", error);
+        res.status(500).send("Internal server error");
+    }
+};
 
-module.exports = ipWhitelist;
+module.exports = applyIpWhitelist;

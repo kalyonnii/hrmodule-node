@@ -130,9 +130,9 @@ const userLogin = asyncHandler(async (req, res) => {
                         console.error("Error querying designation table:", err);
                         return res.status(500).send("Error in Querying Designation Table");
                     }
-                    console.log(designationResult)
+                    // console.log(designationResult)
                     const rbacRoles = designationResult.length > 0 ? designationResult[0].rbac : null;
-                    console.log(rbacRoles)
+                    // console.log(rbacRoles)
                     const user = {
                         ...employee,
                         rbac: rbacRoles,
