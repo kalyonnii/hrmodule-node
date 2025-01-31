@@ -82,33 +82,111 @@ const ipWhitelist = require("../middleware/ipAddress");
 //     });
 // });
 
+//CORRECT CODE 
+// const userLogin = asyncHandler(async (req, res) => {
+//     console.log("req.headers", req.headers["user-type"])
+//     const { username, encryptedPassword } = req.body;
+//     if (!username || !encryptedPassword) {
+//         return res.status(400).send("Please Enter Username and Password");
+//     }
+//     const sqlUser = `SELECT * FROM users WHERE username = ?`;
+//     dbConnect.query(sqlUser, [username], async (err, userResult) => {
+//         if (err) {
+//             console.error("Error querying users table:", err);
+//             return res.status(500).send("Error in Querying Users Table");
+//         }
+//         if (
+//             userResult &&
+//             userResult.length === 1 &&
+//             (await bcrypt.compare(encryptedPassword, userResult[0].encryptedPassword))
+//         ) {
+//             const user = userResult[0];
+//             const accessToken = jwt.sign(
+//                 {
+//                     user: user,
+//                 },
+//                 process.env.ACCESS_TOKEN_SECRET,
+//                 { expiresIn: "3h" }
+//             );
+//             return res.status(200).json({ accessToken });
+//         }
+//         const sqlEmployee = `
+//             SELECT * FROM employees 
+//             WHERE employeeName = ? AND employeeInternalStatus = 1
+//         `;
+//         dbConnect.query(sqlEmployee, [username], (err, employeeResult) => {
+//             if (err) {
+//                 console.error("Error querying employees table:", err);
+//                 return res.status(500).send("Error in Querying in Employees Table");
+//             }
+//             if (
+//                 employeeResult &&
+//                 employeeResult.length === 1 &&
+//                 employeeResult[0].primaryPhone === encryptedPassword
+//             ) {
+//                 const employee = employeeResult[0];
+//                 const sqlDesignation = `SELECT rbac FROM designations WHERE id = ?`;
+//                 dbConnect.query(sqlDesignation, [employee.designation], (err, designationResult) => {
+//                     if (err) {
+//                         console.error("Error querying designation table:", err);
+//                         return res.status(500).send("Error in Querying Designation Table");
+//                     }
+//                     // console.log(designationResult)
+//                     const rbacRoles = designationResult.length > 0 ? designationResult[0].rbac : null;
+//                     // console.log(rbacRoles)
+//                     const user = {
+//                         ...employee,
+//                         rbac: rbacRoles,
+//                     };
+//                     const accessToken = jwt.sign(
+//                         { user },
+//                         process.env.ACCESS_TOKEN_SECRET,
+//                         { expiresIn: "3h" }
+//                     );
+//                     return res.status(200).json({ accessToken });
+//                 });
+//             } else {
+//                 return res.status(401).send("Username or Password Incorrect");
+//             }
+//         });
+//     });
+// });
+
 
 const userLogin = asyncHandler(async (req, res) => {
+    console.log("User Type:", req.headers["user-type"]);
+    const userType = JSON.parse(req.headers["user-type"]);
     const { username, encryptedPassword } = req.body;
+
     if (!username || !encryptedPassword) {
         return res.status(400).send("Please Enter Username and Password");
     }
-    const sqlUser = `SELECT * FROM users WHERE username = ?`;
-    dbConnect.query(sqlUser, [username], async (err, userResult) => {
-        if (err) {
-            console.error("Error querying users table:", err);
-            return res.status(500).send("Error in Querying Users Table");
-        }
-        if (
-            userResult &&
-            userResult.length === 1 &&
-            (await bcrypt.compare(encryptedPassword, userResult[0].encryptedPassword))
-        ) {
-            const user = userResult[0];
-            const accessToken = jwt.sign(
-                {
-                    user: user,
-                },
-                process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: "3h" }
-            );
-            return res.status(200).json({ accessToken });
-        }
+
+    if (userType == "user") {
+        // Query the users table
+        const sqlUser = `SELECT * FROM users WHERE username = ?`;
+        dbConnect.query(sqlUser, [username], async (err, userResult) => {
+            if (err) {
+                console.error("Error querying users table:", err);
+                return res.status(500).send("Error in Querying Users Table");
+            }
+            if (
+                userResult &&
+                userResult.length === 1 &&
+                (await bcrypt.compare(encryptedPassword, userResult[0].encryptedPassword))
+            ) {
+                const user = userResult[0];
+                const accessToken = jwt.sign(
+                    { user },
+                    process.env.ACCESS_TOKEN_SECRET,
+                    { expiresIn: "3h" }
+                );
+                return res.status(200).json({ accessToken });
+            }
+            return res.status(401).send("Username or Password Incorrect");
+        });
+    } else if (userType == "employee") {
+        // Query the employees table
         const sqlEmployee = `
             SELECT * FROM employees 
             WHERE employeeName = ? AND employeeInternalStatus = 1
@@ -116,7 +194,7 @@ const userLogin = asyncHandler(async (req, res) => {
         dbConnect.query(sqlEmployee, [username], (err, employeeResult) => {
             if (err) {
                 console.error("Error querying employees table:", err);
-                return res.status(500).send("Error in Querying in Employees Table");
+                return res.status(500).send("Error in Querying Employees Table");
             }
             if (
                 employeeResult &&
@@ -130,9 +208,7 @@ const userLogin = asyncHandler(async (req, res) => {
                         console.error("Error querying designation table:", err);
                         return res.status(500).send("Error in Querying Designation Table");
                     }
-                    // console.log(designationResult)
                     const rbacRoles = designationResult.length > 0 ? designationResult[0].rbac : null;
-                    // console.log(rbacRoles)
                     const user = {
                         ...employee,
                         rbac: rbacRoles,
@@ -148,7 +224,9 @@ const userLogin = asyncHandler(async (req, res) => {
                 return res.status(401).send("Username or Password Incorrect");
             }
         });
-    });
+    } else {
+        return res.status(400).send("Invalid User Type");
+    }
 });
 
 
