@@ -5,7 +5,8 @@ const {
     getUsersCount,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    changeUserStatus
 } = require("../controllers/usersController");
 const validateToken = require("../middleware/validateTokenHandler");
 
@@ -14,6 +15,9 @@ const router = express.Router();
 router.route("/").get(validateToken, getUsers).post(validateToken, createUser);
 
 router.route("/total").get(validateToken, getUsersCount);
+router
+    .route("/:userId/changestatus/:statusId")
+    .put(validateToken, changeUserStatus);
 
 router
     .route("/:id")

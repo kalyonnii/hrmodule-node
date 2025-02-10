@@ -88,6 +88,8 @@ const createUser = asyncHandler(async (req, res) => {
     let encryptedPassword = await bcrypt.hash(password, 12);
     req.body["encryptedPassword"] = encryptedPassword;
     req.body["userId"] = userId;
+    req.body["userInternalStatus"] = 1;
+    req.body["lastUserInternalStatus"] = 1;
     req.body["createdBy"] = req.user.username;
     req.body["lastUpdatedBy"] = req.user.username;
     const checkIfExistsQuery = `SELECT * FROM users WHERE username = ?`;
@@ -192,11 +194,40 @@ const deleteUser = asyncHandler((req, res) => {
     });
 });
 
+const changeUserStatus = asyncHandler((req, res) => {
+    const id = req.params.userId;
+    const statusId = req.params.statusId;
+    const createSql = `SELECT * FROM users WHERE userId = '${id}'`;
+    dbConnect.query(createSql, (err, result) => {
+        if (err) {
+            console.log("changeUserStatus error:");
+            return res.status(500).send("Error In Changing the User Status");
+        }
+        if (result && result[0] && statusId) {
+            let statusData = {
+                lastUserInternalStatus: result[0].userInternalStatus,
+                userInternalStatus: statusId,
+            };
+            const updateClause = updateClauseHandler(statusData);
+            const sql = `UPDATE users SET ${updateClause} WHERE userId = '${id}'`;
+            dbConnect.query(sql, (err, result) => {
+                if (err) {
+                    console.log("changeUserStatus and updatecalss error:");
+                    return res.status(500).send("Error In Updating the User Status");
+                }
+                res.status(200).send(true);
+            });
+        } else {
+            res.status(422).send("No Users Found");
+        }
+    });
+});
 module.exports = {
     getUsers,
     getUserById,
     getUsersCount,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    changeUserStatus
 };

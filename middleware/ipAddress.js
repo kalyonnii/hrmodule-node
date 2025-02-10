@@ -56,12 +56,12 @@ async function ipWhitelist(req, res, next) {
 const applyIpWhitelist = async (req, res, next) => {
     try {
         const userType = req.headers["user-type"] ? req.headers["user-type"].trim().toLowerCase() : "";
-        console.log("UserType Trimmed:", userType);
-        if (JSON.parse(userType) === "employee") {
-            console.log("true");
+        // console.log("UserType Trimmed:", userType);
+        if (userType === "employee") {
+            // console.log("true");
             return next();
         }
-        console.log("Not an Employee");
+        // console.log("Not an Employee");
         await ipWhitelist(req, res, next);
     } catch (error) {
         console.error("Error in applyIpWhitelist:", error);

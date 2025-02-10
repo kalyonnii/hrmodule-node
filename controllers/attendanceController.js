@@ -68,8 +68,8 @@ const createAttendance = asyncHandler((req, res) => {
             } else {
                 let attendanceId = "A-" + generateRandomNumber(6);
                 req.body["attendanceId"] = attendanceId;
-                req.body["createdBy"] = req.user.username;
-                req.body["lastUpdatedBy"] = req.user.username;
+                req.body["createdBy"] = getUserDisplayName(req);
+                req.body["lastUpdatedBy"] = getUserDisplayName(req);
                 const createClause = createClauseHandler(req.body);
                 const sql = `INSERT INTO attendance (${createClause[0]}) VALUES (${createClause[1]})`;
                 dbConnect.query(sql, (err, result) => {
@@ -84,6 +84,10 @@ const createAttendance = asyncHandler((req, res) => {
     });
 });
 
+function getUserDisplayName(req) {
+    const isEmployee = req?.user?.rbac?.includes('employee');
+    return isEmployee ? req?.user?.employeeName : req?.user?.username;
+}
 const updateAttendance = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const { attendanceDate, attendanceData } = req.body;
@@ -105,7 +109,7 @@ const updateAttendance = asyncHandler(async (req, res) => {
                     `Attendance already exists with Attendance Date ${attendanceDate}, created by - ${attendance.createdBy}, Attendance ID - ${attendance.attendanceId}`
                 );
         }
-        const lastupdatedby = req.user.username;
+        const lastupdatedby = getUserDisplayName(req);
         const updateSql = `UPDATE attendance 
                            SET attendanceDate = ?, attendanceData = ? , lastUpdatedBy = ?
                            WHERE attendanceId = ?`;

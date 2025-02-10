@@ -53,6 +53,8 @@ const getSalaryHikesById = asyncHandler((req, res) => {
 const createSalaryHike = asyncHandler((req, res) => {
     let hikeId = "S-" + generateRandomNumber(6);
     req.body["hikeId"] = hikeId;
+    req.body["hikeInternalStatus"] = 1;
+    req.body["lastHikeInternalStatus"] = 1;
     req.body["createdBy"] = req.user.username;
     req.body["lastUpdatedBy"] = req.user.username;
     const createClause = createClauseHandler(req.body);
@@ -128,7 +130,34 @@ const deleteSalaryHike = asyncHandler((req, res) => {
         res.status(200).json({ message: "Salary Hike Deleted Successfully" });
     });
 });
-
+const changeSalaryHikeStatus = asyncHandler((req, res) => {
+    const id = req.params.hikeId;
+    const statusId = req.params.statusId;
+    const createSql = `SELECT * FROM salaryhikes WHERE hikeId = '${id}'`;
+    dbConnect.query(createSql, (err, result) => {
+        if (err) {
+            console.log("changeSalaryHikesStatus error:");
+            return res.status(500).send("Error in Changing the Salary Hike Status");
+        }
+        if (result && result[0] && statusId) {
+            let statusData = {
+                lastHikeInternalStatus: result[0].hikeInternalStatus,
+                hikeInternalStatus: statusId,
+            };
+            const updateClause = updateClauseHandler(statusData);
+            const sql = `UPDATE salaryhikes SET ${updateClause} WHERE hikeId = '${id}'`;
+            dbConnect.query(sql, (err, result) => {
+                if (err) {
+                    console.log("changeSalaryHikeStatus and updatecalss error:");
+                    return res.status(500).send("Error in Updating the Salary Hike Status");
+                }
+                res.status(200).send(true);
+            });
+        } else {
+            res.status(422).send("No Salary Hikes Found");
+        }
+    });
+});
 module.exports = {
     getSalaryHikesById,
     getSalaryHikes,
@@ -136,4 +165,5 @@ module.exports = {
     createSalaryHike,
     updateSalaryHike,
     deleteSalaryHike,
+    changeSalaryHikeStatus
 };

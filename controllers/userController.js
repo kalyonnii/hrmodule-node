@@ -155,16 +155,14 @@ const ipWhitelist = require("../middleware/ipAddress");
 
 const userLogin = asyncHandler(async (req, res) => {
     console.log("User Type:", req.headers["user-type"]);
-    const userType = JSON.parse(req.headers["user-type"]);
+    const userType = req.headers["user-type"];
     const { username, encryptedPassword } = req.body;
 
     if (!username || !encryptedPassword) {
         return res.status(400).send("Please Enter Username and Password");
     }
-
     if (userType == "user") {
-        // Query the users table
-        const sqlUser = `SELECT * FROM users WHERE username = ?`;
+        const sqlUser = `SELECT * FROM users WHERE username = ? AND userInternalStatus = 1`;
         dbConnect.query(sqlUser, [username], async (err, userResult) => {
             if (err) {
                 console.error("Error querying users table:", err);
