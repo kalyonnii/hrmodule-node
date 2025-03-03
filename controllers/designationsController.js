@@ -100,7 +100,7 @@ const deleteDesignation = asyncHandler((req, res) => {
 const changeDesignationStatus = asyncHandler((req, res) => {
     const id = req.params.designationId;
     const statusId = req.params.statusId;
-    console.log(id)
+    // console.log(id)
     const createSql = `SELECT * FROM designations WHERE designationId = '${id}'`;
     dbConnect.query(createSql, (err, result) => {
         if (err) {

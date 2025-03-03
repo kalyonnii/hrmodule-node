@@ -4,6 +4,7 @@ const app = express();
 const https = require('https');
 const fs = require('fs');
 const applyIpWhitelist = require('./middleware/ipAddress.js');
+const { scheduleCronJobs } = require('./controllers/nodemail.js');
 app.use(express.json());
 
 app.use(
@@ -21,7 +22,7 @@ const options = {
     ca: fs.readFileSync('./ssl/chain.pem')
 };
 
-app.use("/user", applyIpWhitelist, require("./routes/userRoutes"));
+app.use("/user", require("./routes/userRoutes"));
 app.use("/employees", applyIpWhitelist, require("./routes/employeesRoutes"));
 app.use("/holidays", applyIpWhitelist, require("./routes/holidaysRoutes"));
 app.use("/incentives", applyIpWhitelist, require("./routes/incentivesRoutes"));
@@ -33,9 +34,10 @@ app.use("/attendance", applyIpWhitelist, require("./routes/attendanceRoutes"));
 app.use("/leaves", applyIpWhitelist, require("./routes/leavemanagementRoutes"));
 app.use("/payroll", applyIpWhitelist, require("./routes/payrollRoutes"));
 app.use("/reports", applyIpWhitelist, require("./routes/reportsRoutes"));
-app.use("/mail", applyIpWhitelist, require("./routes/nodeMailRoutes"));
+// app.use("/mail", applyIpWhitelist, require("./routes/nodeMailRoutes"));
 app.use("/ipAddress", applyIpWhitelist, require("./routes/ipAddressRoutes.js"));
 
+scheduleCronJobs();
 // app.listen(process.env.PORT, () => {
 //     console.log(`Server running at http://localhost:${process.env.PORT}`);
 // });

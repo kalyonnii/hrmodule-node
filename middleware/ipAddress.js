@@ -1,7 +1,7 @@
 const axios = require("axios");
 const dbConnect = require("../config/dbConnection");
 const { userLogoutforIp } = require("../controllers/userController");
-
+const jwt = require("jsonwebtoken");
 function isUserLoggedIn(req) {
 
     return req.body.username == null;
@@ -55,10 +55,20 @@ async function ipWhitelist(req, res, next) {
 }
 const applyIpWhitelist = async (req, res, next) => {
     try {
+        // console.log(req.headers)
         const userType = req.headers["user-type"] ? req.headers["user-type"].trim().toLowerCase() : "";
         // console.log("UserType Trimmed:", userType);
-        if (userType === "employee") {
-            // console.log("true");
+        const authHeader = req.headers["authorization"];
+        if (!authHeader) {
+            return res.status(401).json({ message: "Authorization header missing" });
+        }
+        const token = authHeader.split(" ")[1]; 
+        const secretKey = process.env.ACCESS_TOKEN_SECRET; 
+        const decoded = jwt.verify(token, secretKey); 
+        // console.log("Decoded User Data:", decoded);
+        const designation = decoded?.user?.designation || "";
+        // console.log("designation Trimmed:", designation);
+        if (userType === "employee" || designation == 1 || designation == 4) {
             return next();
         }
         // console.log("Not an Employee");

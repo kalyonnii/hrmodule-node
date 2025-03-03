@@ -56,7 +56,7 @@ const getIpAddressCount = asyncHandler(async (req, res) => {
 });
 
 const getIpAddressById = asyncHandler((req, res) => {
-    console.log(req.params)
+    // console.log(req.params)
     const sql = `SELECT * FROM ipaddresses WHERE ipAddressId = '${req.params.id}'`;
     dbConnect.query(sql, (err, result) => {
         if (err) {

@@ -197,6 +197,27 @@ const changeEmployeeStatus = asyncHandler((req, res) => {
         }
     });
 });
+function fetchEmployees() {
+    return new Promise((resolve, reject) => {
+        dbConnect.query("SELECT * FROM employees", (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            const employeeData = results;
+            resolve(employeeData);
+        });
+    });
+}
+const getEmployeeName = async (userId) => {
+    try {
+        const employees = await fetchEmployees();
+        const employee = employees.find((employee) => employee.employeeId == userId);
+        return employee ? employee.employeeName : "";
+    } catch (error) {
+        console.error("Error getting Employee names:", error);
+        throw error;
+    }
+};
 module.exports = {
     getEmployeeById,
     getEmployeesCount,
@@ -205,5 +226,6 @@ module.exports = {
     updateEmployee,
     deleteEmployee,
     changeEmployeeStatus,
-    createEmployeeFromInterview
+    createEmployeeFromInterview,
+    getEmployeeName
 };
