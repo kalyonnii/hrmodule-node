@@ -55,24 +55,29 @@ async function ipWhitelist(req, res, next) {
 }
 const applyIpWhitelist = async (req, res, next) => {
     try {
-        // console.log(req.headers)
         const userType = req.headers["user-type"] ? req.headers["user-type"].trim().toLowerCase() : "";
-        // console.log("UserType Trimmed:", userType);
         const authHeader = req.headers["authorization"];
         if (!authHeader) {
             return res.status(401).json({ message: "Authorization header missing" });
         }
-        const token = authHeader.split(" ")[1]; 
-        const secretKey = process.env.ACCESS_TOKEN_SECRET; 
-        const decoded = jwt.verify(token, secretKey); 
-        // console.log("Decoded User Data:", decoded);
-        const designation = decoded?.user?.designation || "";
-        // console.log("designation Trimmed:", designation);
-        if (userType === "employee" || designation == 1 || designation == 4) {
-            return next();
+        const token = authHeader.split(" ")[1];
+        const secretKey = process.env.ACCESS_TOKEN_SECRET;
+        try {
+            const decoded = jwt.verify(token, secretKey);
+            const designation = decoded?.user?.designation || "";
+            if (userType === "employee" || designation == 1 || designation == 4) {
+                return next();
+            }
+            // console.log("Not an Employee");
+            await ipWhitelist(req, res, next);
         }
-        // console.log("Not an Employee");
-        await ipWhitelist(req, res, next);
+        catch (error) {
+            if (error.name === "TokenExpiredError") {
+                return res.status(419).send("Session expired. Please log in again.");
+            } else {
+                return res.status(419).send("Invalid token. Authentication failed.");
+            }
+        }
     } catch (error) {
         console.error("Error in applyIpWhitelist:", error);
         res.status(500).send("Internal server error");
