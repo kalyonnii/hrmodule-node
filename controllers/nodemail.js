@@ -118,7 +118,7 @@ async function sendAttendanceReport() {
         // Email options
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: 'mudhiiguubbakalyonnii@gmail.com',
+            to: 'ravi.n@winwaycreators.com, hema.p@winwaycreators.com, mudhiiguubbakalyonnii@gmail.com, cnarendra329@gmail.com',
             subject: `Attendance Report - ${formattedDate}`,
             html: emailHtml,
         };
