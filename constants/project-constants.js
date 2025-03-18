@@ -182,6 +182,12 @@ module.exports = {
             { header: "Created On", key: "createdOn" },
             { header: "Last Updated By", key: "lastUpdatedBy" },
             { header: "Last Updated On", key: "lastUpdatedOn" },
-        ]
+        ],
+        LEAVE_STATUS: [
+            { id: 0, name: 'all', displayName: 'All Leaves' },
+            { id: 1, name: 'pending', displayName: 'Pending Leaves' },
+            { id: 2, name: 'approved', displayName: 'Approved Leaves' },
+            { id: 3, name: 'rejected', displayName: 'Rejected Leaves' },
+        ],
     },
 };
