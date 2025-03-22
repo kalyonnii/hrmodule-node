@@ -30,6 +30,26 @@ async function getAttendanceData() {
         return [];
     }
 }
+async function getJoiningDate(employeeId) {
+    try {
+        const sql = `SELECT joiningDate FROM employees WHERE employeeId = ?`;
+        const result = await new Promise((resolve, reject) => {
+            dbConnect.query(sql, [employeeId], (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(result);
+            });
+        });
+        if (result.length === 0) return 'N/A';
+        // Format the joining date to 'MMM DD, YYYY' (e.g., Aug 20, 2024)
+        return moment(result[0].joiningDate).format('MMM DD, YYYY');
+    } catch (error) {
+        console.error('Error fetching joining date:', error);
+        return 'N/A';
+    }
+}
 
 /**
  * Generate and send attendance report via email
@@ -56,6 +76,7 @@ async function sendAttendanceReport() {
         const tableRows = await Promise.all(
             attendanceData[0]?.attendanceData.map(async (item, index) => {
                 const employeeName = await getEmployeeName(item.employeeId);
+                const joiningDate = await getJoiningDate(item.employeeId); // Fetch joining date
                 // Update counts based on status
                 switch (item.status) {
                     case 'Present':
@@ -75,6 +96,7 @@ async function sendAttendanceReport() {
                     <tr>
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${index + 1}</td>
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${employeeName.toUpperCase()}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${joiningDate}</td>
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${item.status}</td>
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${item.checkInTime || '-'}</td>
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: left;">${item.reason || '-'}</td>
@@ -97,6 +119,7 @@ async function sendAttendanceReport() {
                     <tr>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">ID</th>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Employee Name</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Joining Date</th>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Status</th>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Check-in Time</th>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Reason</th>
