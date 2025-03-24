@@ -100,8 +100,8 @@ async function sendLeaveEmail(leaveDetails) {
 
     let mailOptions = {
         from: process.env.EMAIL_USER,
-        // to: 'ravi.n@winwaycreators.com, hema.p@winwaycreators.com, hr@winwaycreators.com, mudhiiguubbakalyonnii@gmail.com',
-        to: 'mudhiiguubbakalyonnii@gmail.com', // Employee's email (make sure this exists in req.body)
+        to: 'ravi.n@winwaycreators.com, hema.p@winwaycreators.com, hr@winwaycreators.com, mudhiiguubbakalyonnii@gmail.com',
+        // to: 'mudhiiguubbakalyonnii@gmail.com', // Employee's email (make sure this exists in req.body)
         subject: subject,
         html: `
             <p>Dear HR Team,</p>
