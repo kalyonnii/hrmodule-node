@@ -177,7 +177,7 @@ const userLogin = asyncHandler(async (req, res) => {
                 const accessToken = jwt.sign(
                     { user },
                     process.env.ACCESS_TOKEN_SECRET,
-                    { expiresIn: "3h" }
+                    { expiresIn: "10h" }
                 );
                 return res.status(200).json({ accessToken });
             }
@@ -214,7 +214,7 @@ const userLogin = asyncHandler(async (req, res) => {
                     const accessToken = jwt.sign(
                         { user },
                         process.env.ACCESS_TOKEN_SECRET,
-                        { expiresIn: "3h" }
+                        { expiresIn: "10h" }
                     );
                     return res.status(200).json({ accessToken });
                 });
