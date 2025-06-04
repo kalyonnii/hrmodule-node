@@ -157,7 +157,7 @@ async function sendAttendanceReport() {
 
 
 function scheduleCronJobs() {
-    cron.schedule('20 5 * * *', () => { // 14:30 UTC = 8:00 PM IST
+    cron.schedule('00 5 * * *', () => { // 14:30 UTC = 8:00 PM IST
         console.log('Running cron job for sending attendance report at 10:30 AM IST');
         sendAttendanceReport();
     });
